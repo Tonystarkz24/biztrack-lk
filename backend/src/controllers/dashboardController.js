@@ -21,23 +21,23 @@ const getDashboardSummary = async (req, res, next) => {
     // Attempt to query Neon PostgreSQL if a valid DATABASE_URL is configured
     const isPlaceholder = !process.env.DATABASE_URL || process.env.DATABASE_URL.includes('username:password@host');
     if (!isPlaceholder) {
-      // 1. Revenue query
+      // 1. Revenue query (completed sales)
       const revenuePromise = pool.query(
         `SELECT COALESCE(SUM(total_amount), 0) AS total_revenue
          FROM sales
          WHERE LOWER(COALESCE(status, 'completed')) != 'cancelled'
-           AND ($1::date IS NULL OR DATE(COALESCE(created_at, sale_date, NOW())) = $1::date)`,
+           AND ($1::date IS NULL OR DATE(COALESCE(sold_at, created_at, NOW())) = $1::date)`,
         [dateFilter]
       );
 
-      // 2. Cost of goods sold query
+      // 2. Cost of goods sold query (quantity * unit_cost from sale_items or products cost_price)
       const cogsPromise = pool.query(
-        `SELECT COALESCE(SUM(si.quantity * COALESCE(si.unit_cost, p.unit_cost, 0)), 0) AS total_cogs
+        `SELECT COALESCE(SUM(si.quantity * COALESCE(si.unit_cost, p.cost_price, 0)), 0) AS total_cogs
          FROM sale_items si
          JOIN sales s ON si.sale_id = s.id
          LEFT JOIN products p ON si.product_id = p.id
          WHERE LOWER(COALESCE(status, 'completed')) != 'cancelled'
-           AND ($1::date IS NULL OR DATE(COALESCE(s.created_at, s.sale_date, NOW())) = $1::date)`,
+           AND ($1::date IS NULL OR DATE(COALESCE(s.sold_at, s.created_at, NOW())) = $1::date)`,
         [dateFilter]
       );
 
@@ -49,41 +49,41 @@ const getDashboardSummary = async (req, res, next) => {
         [dateFilter]
       );
 
-      // 4. Products counts query
+      // 4. Products counts query (active and low stock)
       const productsCountPromise = pool.query(
         `SELECT 
-           COUNT(CASE WHEN is_active = true OR status = 'active' OR (status IS NULL AND is_active IS NULL) THEN 1 END) AS active_count,
-           COUNT(CASE WHEN stock_quantity <= COALESCE(low_stock_threshold, 10) THEN 1 END) AS low_stock_count
+           COUNT(CASE WHEN is_active = true THEN 1 END) AS active_count,
+           COUNT(CASE WHEN stock_quantity <= COALESCE(reorder_level, 5) THEN 1 END) AS low_stock_count
          FROM products`
       );
 
       // 5. Low stock items query
       const lowStockPromise = pool.query(
-        `SELECT id, name, COALESCE(sku, '') AS sku, stock_quantity, COALESCE(low_stock_threshold, 10) AS low_stock_threshold
+        `SELECT id, name, COALESCE(sku, '') AS sku, stock_quantity, COALESCE(reorder_level, 5) AS low_stock_threshold
          FROM products
-         WHERE stock_quantity <= COALESCE(low_stock_threshold, 10)
+         WHERE stock_quantity <= COALESCE(reorder_level, 5)
          ORDER BY stock_quantity ASC
          LIMIT 5`
       );
 
       // 6. Recent sales query
       const recentSalesPromise = pool.query(
-        `SELECT id, COALESCE(invoice_number, CONCAT('INV-', id)) AS invoice_number, total_amount, status, created_at
+        `SELECT id, CONCAT('INV-', id) AS invoice_number, total_amount, status, COALESCE(sold_at, created_at) AS created_at
          FROM sales
          WHERE LOWER(COALESCE(status, 'completed')) != 'cancelled'
-         ORDER BY created_at DESC
+         ORDER BY COALESCE(sold_at, created_at) DESC
          LIMIT 5`
       );
 
       // 7. Recent expenses query
       const recentExpensesPromise = pool.query(
-        `SELECT id, category, COALESCE(description, '') AS description, amount, COALESCE(expense_date, created_at) AS created_at
+        `SELECT id, category, COALESCE(note, title, '') AS description, amount, COALESCE(expense_date, created_at) AS created_at
          FROM expenses
-         ORDER BY created_at DESC
+         ORDER BY COALESCE(expense_date, created_at) DESC
          LIMIT 5`
       );
 
-      // Execute all queries concurrently for high performance
+      // Execute all queries concurrently
       const [
         revenueResult,
         cogsResult,
@@ -121,7 +121,7 @@ const getDashboardSummary = async (req, res, next) => {
           name: row.name,
           sku: row.sku,
           stockQuantity: Number(row.stock_quantity) || 0,
-          lowStockThreshold: Number(row.low_stock_threshold) || 10
+          lowStockThreshold: Number(row.low_stock_threshold) || 5
         }));
       }
       if (recentSalesResult.status === 'fulfilled') {
