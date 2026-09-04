@@ -8,7 +8,7 @@
   min-height: 100vh;
   width: 100%;
   padding: 2rem;
-  background: var(--bg-color);
+  background: var(--bg-primary);
   box-sizing: border-box;
 }
 
@@ -19,7 +19,7 @@
 .sales-page__title {
   font-size: 2rem;
   font-weight: 700;
-  background: var(--accent-gradient);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -48,7 +48,7 @@
 /* ── Panels ───────────────────────────────────────────────────────── */
 .sale-form,
 .sales-history {
-  background: var(--card-bg);
+  background: var(--gradient-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 1.75rem;
@@ -98,7 +98,7 @@
 }
 
 .form-input:focus {
-  border-color: var(--accent-color);
+  border-color: var(--color-primary);
   background: rgba(56, 189, 248, 0.04);
 }
 
@@ -138,14 +138,14 @@
 }
 
 .payment-btn:hover {
-  border-color: var(--accent-color);
+  border-color: var(--color-primary);
   color: var(--text-primary);
 }
 
 .payment-btn--active {
   background: rgba(56, 189, 248, 0.12);
-  border-color: var(--accent-color);
-  color: var(--accent-color);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* ── Product selector ─────────────────────────────────────────────── */
@@ -203,7 +203,7 @@
 .add-btn {
   flex: 1;
   padding: 0.55rem 1rem;
-  background: var(--accent-gradient);
+  background: var(--gradient-primary);
   border: none;
   border-radius: 8px;
   color: #0f172a;
@@ -283,7 +283,7 @@
 .sale-item-row__subtotal {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--accent-color);
+  color: var(--color-primary);
   min-width: 85px;
   text-align: right;
 }
@@ -333,7 +333,7 @@
 
 .sale-summary__total {
   font-size: 1.25rem;
-  background: var(--accent-gradient);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -349,7 +349,7 @@
 .submit-btn {
   width: 100%;
   padding: 0.875rem;
-  background: var(--accent-gradient);
+  background: var(--gradient-primary);
   border: none;
   border-radius: 10px;
   color: #0f172a;
@@ -382,7 +382,7 @@
   width: 28px;
   height: 28px;
   border: 3px solid rgba(56, 189, 248, 0.2);
-  border-top-color: var(--accent-color);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -409,8 +409,8 @@
 }
 
 .clear-filters-btn:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .filters-row {
@@ -477,7 +477,7 @@
 }
 
 .sale-card:hover {
-  border-color: var(--accent-color);
+  border-color: var(--color-primary);
   background: rgba(56, 189, 248, 0.05);
   transform: translateY(-1px);
 }
@@ -497,7 +497,7 @@
 .sale-card__meta { display: flex; flex-direction: column; gap: 0.1rem; }
 .sale-card__method { font-size: 0.78rem; color: var(--text-secondary); text-transform: capitalize; }
 .sale-card__date { font-size: 0.71rem; color: var(--text-secondary); opacity: 0.7; }
-.sale-card__total { font-size: 0.95rem; font-weight: 700; color: var(--accent-color); }
+.sale-card__total { font-size: 0.95rem; font-weight: 700; color: var(--color-primary); }
 
 /* ── Modal ────────────────────────────────────────────────────────── */
 .modal-backdrop {
@@ -564,7 +564,7 @@
 .sale-detail-item { display: flex; flex-direction: column; gap: 0.25rem; }
 .sale-detail-label { font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 .sale-detail-value { font-size: 0.92rem; color: var(--text-primary); }
-.sale-detail-value--accent { color: var(--accent-color); font-weight: 700; font-size: 1.1rem; }
+.sale-detail-value--accent { color: var(--color-primary); font-weight: 700; font-size: 1.1rem; }
 
 .status-badge {
   display: inline-block;
@@ -672,3 +672,4 @@
 .cart-items::-webkit-scrollbar { width: 4px; }
 .cart-items::-webkit-scrollbar-track { background: transparent; }
 .cart-items::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
