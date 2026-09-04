@@ -22,9 +22,6 @@ body {
   min-height: 100vh;
   background-color: var(--bg-color);
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .setup-container {
