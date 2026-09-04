@@ -83,22 +83,22 @@ const ExpensesPage = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'system-ui, -apple-system, sans-serif', colorScheme: 'light', color: '#0f172a' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1 style={{ color: '#0f172a', margin: 0 }}>Expenses Management</h1>
+    <div className="expenses-container">
+      <header className="expenses-header">
+        <div className="header-title-group">
+          <h1>Expenses Management</h1>
+          <p>Track and manage your business operating costs</p>
+        </div>
         {!showForm && (
-          <button 
+          <button
+            type="button"
+            className="btn-primary"
             onClick={handleAddNew}
-            style={{
-              backgroundColor: '#2563eb', color: 'white', border: 'none', 
-              padding: '10px 20px', borderRadius: '6px', fontWeight: '600', 
-              cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-            }}
           >
-            + Add Expense
+            <span>＋ Add Expense</span>
           </button>
         )}
-      </div>
+      </header>
 
       {showForm && (
         <ExpenseForm 

@@ -11,95 +11,65 @@ const ExpenseFilters = ({ filters, setFilters }) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const containerStyle = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '16px',
-    marginBottom: '24px',
-    backgroundColor: '#ffffff',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-  };
-
-  const inputGroupStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: '1 1 200px',
-    gap: '6px'
-  };
-
-  const labelStyle = {
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#475569'
-  };
-
-  const inputStyle = {
-    padding: '8px 12px',
-    backgroundColor: '#f8fafc',
-    color: '#0f172a',
-    border: '1px solid #cbd5e1',
-    borderRadius: '4px',
-    fontSize: '14px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-  };
-
   return (
-    <div style={containerStyle}>
-      <div style={inputGroupStyle}>
-        <label style={labelStyle} htmlFor="search">Search by Title</label>
+    <div className="filters-container">
+      <div className="search-wrapper">
+        <span className="search-icon" aria-hidden="true">🔍</span>
         <input 
-          style={inputStyle}
+          className="search-input"
           type="text" 
-          id="search"
+          id="expense-search"
           name="search"
-          placeholder="e.g. Delivery" 
+          placeholder="Search by title..." 
           value={filters.search} 
           onChange={handleChange}
         />
+        {filters.search && (
+          <button
+            type="button"
+            className="search-clear"
+            onClick={() => setFilters(prev => ({ ...prev, search: '' }))}
+            title="Clear search"
+            aria-label="Clear search"
+          >
+            ×
+          </button>
+        )}
       </div>
 
-      <div style={inputGroupStyle}>
-        <label style={labelStyle} htmlFor="category">Category</label>
-        <select 
-          style={inputStyle}
-          id="category"
-          name="category"
-          value={filters.category} 
-          onChange={handleChange}
-        >
-          <option value="">All Categories</option>
-          {CATEGORIES.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
+      <select 
+        className="filter-select"
+        id="expense-category"
+        name="category"
+        value={filters.category} 
+        onChange={handleChange}
+        aria-label="Filter by Category"
+      >
+        <option value="">All Categories</option>
+        {CATEGORIES.map(cat => (
+          <option key={cat} value={cat}>{cat}</option>
+        ))}
+      </select>
 
-      <div style={inputGroupStyle}>
-        <label style={labelStyle} htmlFor="startDate">Start Date</label>
-        <input 
-          style={inputStyle}
-          type="date" 
-          id="startDate"
-          name="startDate"
-          value={filters.startDate} 
-          onChange={handleChange}
-        />
-      </div>
+      <input 
+        className="form-input"
+        type="date" 
+        id="expense-startDate"
+        name="startDate"
+        value={filters.startDate} 
+        onChange={handleChange}
+        title="Start date"
+      />
 
-      <div style={inputGroupStyle}>
-        <label style={labelStyle} htmlFor="endDate">End Date</label>
-        <input 
-          style={inputStyle}
-          type="date" 
-          id="endDate"
-          name="endDate"
-          value={filters.endDate} 
-          onChange={handleChange}
-        />
-      </div>
+      <input 
+        className="form-input"
+        type="date" 
+        id="expense-endDate"
+        name="endDate"
+        value={filters.endDate} 
+        onChange={handleChange}
+        title="End date"
+      />
     </div>
   );
 };

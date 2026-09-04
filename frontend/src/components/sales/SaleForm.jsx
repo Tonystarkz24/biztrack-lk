@@ -13,23 +13,28 @@ function SaleForm({ products, loadingProducts, onSaleCreated, showNotification }
 
   // Products not yet in cart and still in stock
   const available = products.filter(
-    p => p.is_active && p.stock_quantity > 0 && !cartItems.find(c => c.productId === p.id)
+    p => p.is_active && Number(p.stock_quantity) > 0 && !cartItems.find(c => String(c.productId) === String(p.id))
   );
 
   const addToCart = () => {
     if (!selectedProductId) return;
-    const product = products.find(p => p.id === Number(selectedProductId));
+    const product = products.find(p => String(p.id) === String(selectedProductId));
     if (!product) return;
     const qty = Number(quantity);
     if (qty <= 0) { showNotification("Quantity must be greater than zero", "error"); return; }
-    if (qty > product.stock_quantity) {
-      showNotification(`Only ${product.stock_quantity} units of "${product.name}" are in stock`, "error");
+    const availableStock = Number(product.stock_quantity);
+    if (qty > availableStock) {
+      showNotification(`Only ${availableStock} units of "${product.name}" are in stock`, "error");
       return;
     }
-    const existing = cartItems.find(c => c.productId === product.id);
+    const existing = cartItems.find(c => String(c.productId) === String(product.id));
     if (existing) {
+      if (existing.quantity + qty > availableStock) {
+        showNotification(`Cannot add ${qty} more. Only ${availableStock} total units in stock.`, "error");
+        return;
+      }
       setCartItems(cartItems.map(c =>
-        c.productId === product.id ? { ...c, quantity: c.quantity + qty } : c
+        String(c.productId) === String(product.id) ? { ...c, quantity: c.quantity + qty } : c
       ));
     } else {
       setCartItems([...cartItems, {
@@ -37,17 +42,23 @@ function SaleForm({ products, loadingProducts, onSaleCreated, showNotification }
         name:           product.name,
         sellingPrice:   parseFloat(product.selling_price),
         quantity:       qty,
-        availableStock: product.stock_quantity
+        availableStock: availableStock
       }]);
     }
     setSelectedProductId("");
     setQuantity(1);
   };
 
-  const removeFromCart  = (pid) => setCartItems(cartItems.filter(c => c.productId !== pid));
+  const removeFromCart  = (pid) => setCartItems(cartItems.filter(c => String(c.productId) !== String(pid)));
   const updateQuantity  = (pid, qty) => {
-    if (Number(qty) <= 0) return;
-    setCartItems(cartItems.map(c => c.productId === pid ? { ...c, quantity: Number(qty) } : c));
+    const val = Number(qty);
+    if (val <= 0) return;
+    const item = cartItems.find(c => String(c.productId) === String(pid));
+    if (item && val > item.availableStock) {
+      showNotification(`Only ${item.availableStock} units available for ${item.name}`, "error");
+      return;
+    }
+    setCartItems(cartItems.map(c => String(c.productId) === String(pid) ? { ...c, quantity: val } : c));
   };
 
   const estimatedTotal = cartItems.reduce((s, c) => s + c.sellingPrice * c.quantity, 0);
@@ -59,7 +70,7 @@ function SaleForm({ products, loadingProducts, onSaleCreated, showNotification }
       await salesService.createSale({
         customerName:  customerName.trim() || null,
         paymentMethod,
-        items: cartItems.map(c => ({ productId: c.productId, quantity: c.quantity }))
+        items: cartItems.map(c => ({ productId: Number(c.productId), quantity: c.quantity }))
       });
       setCartItems([]);
       setCustomerName("");

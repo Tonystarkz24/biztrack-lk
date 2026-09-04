@@ -90,93 +90,126 @@ const ExpenseForm = ({ expenseToEdit, onSave, onCancel }) => {
   };
 
   return (
-    <div style={{
-      backgroundColor: '#ffffff',
-      padding: '24px',
-      borderRadius: '8px',
-      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
-      marginBottom: '24px',
-      border: '1px solid #e2e8f0'
-    }}>
-      <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#0f172a' }}>
+    <div className="card-panel" style={{ marginBottom: '1.5rem' }}>
+      <h3 className="panel-title">
         {expenseToEdit ? 'Edit Expense' : 'Add New Expense'}
       </h3>
       
       {apiError && (
-        <div style={{ backgroundColor: '#fef2f2', color: '#b91c1c', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
-          {apiError}
+        <div className="toast-banner error" style={{ marginBottom: '1rem' }}>
+          <span>{apiError}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '14px', fontWeight: '500' }}>Title *</label>
+      <form onSubmit={handleSubmit}>
+        <div className="form-grid">
+          {/* Title */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="expense-title">
+              Title <span className="required">*</span>
+            </label>
             <input 
-              name="title" value={formData.title} onChange={handleChange}
+              id="expense-title"
+              name="title"
+              type="text"
+              className={`form-input ${errors.title ? 'has-error' : ''}`}
+              value={formData.title}
+              onChange={handleChange}
               placeholder="Enter expense title"
-              style={{ padding: '8px', backgroundColor: '#f8fafc', color: '#0f172a', border: errors.title ? '1px solid red' : '1px solid #cbd5e1', borderRadius: '4px', outline: 'none' }}
+              disabled={isSubmitting}
             />
-            {errors.title && <span style={{ color: 'red', fontSize: '12px' }}>{errors.title}</span>}
+            {errors.title && <span className="form-error">{errors.title}</span>}
           </div>
 
-          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '14px', fontWeight: '500' }}>Category *</label>
+          {/* Category */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="expense-category-select">
+              Category <span className="required">*</span>
+            </label>
             <select 
-              name="category" value={formData.category} onChange={handleChange}
-              style={{ padding: '8px', backgroundColor: '#f8fafc', color: '#0f172a', border: errors.category ? '1px solid red' : '1px solid #cbd5e1', borderRadius: '4px', outline: 'none' }}
+              id="expense-category-select"
+              name="category"
+              className={`form-input ${errors.category ? 'has-error' : ''}`}
+              value={formData.category}
+              onChange={handleChange}
+              disabled={isSubmitting}
             >
               <option value="">Select a category</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            {errors.category && <span style={{ color: 'red', fontSize: '12px' }}>{errors.category}</span>}
+            {errors.category && <span className="form-error">{errors.category}</span>}
           </div>
-        </div>
 
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '14px', fontWeight: '500' }}>Amount *</label>
+          {/* Amount */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="expense-amount">
+              Amount (LKR) <span className="required">*</span>
+            </label>
             <input 
-              type="number" step="0.01" name="amount" value={formData.amount} onChange={handleChange}
+              id="expense-amount"
+              type="number"
+              step="0.01"
+              name="amount"
+              className={`form-input ${errors.amount ? 'has-error' : ''}`}
+              value={formData.amount}
+              onChange={handleChange}
               placeholder="0.00"
-              style={{ padding: '8px', backgroundColor: '#f8fafc', color: '#0f172a', border: errors.amount ? '1px solid red' : '1px solid #cbd5e1', borderRadius: '4px', outline: 'none' }}
+              disabled={isSubmitting}
             />
-            {errors.amount && <span style={{ color: 'red', fontSize: '12px' }}>{errors.amount}</span>}
+            {errors.amount && <span className="form-error">{errors.amount}</span>}
           </div>
 
-          <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <label style={{ fontSize: '14px', fontWeight: '500' }}>Date *</label>
+          {/* Date */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="expense-date">
+              Date <span className="required">*</span>
+            </label>
             <input 
-              type="date" name="expenseDate" value={formData.expenseDate} onChange={handleChange}
-              style={{ padding: '8px', backgroundColor: '#f8fafc', color: '#0f172a', border: errors.expenseDate ? '1px solid red' : '1px solid #cbd5e1', borderRadius: '4px', outline: 'none' }}
+              id="expense-date"
+              type="date"
+              name="expenseDate"
+              className={`form-input ${errors.expenseDate ? 'has-error' : ''}`}
+              value={formData.expenseDate}
+              onChange={handleChange}
+              disabled={isSubmitting}
             />
-            {errors.expenseDate && <span style={{ color: 'red', fontSize: '12px' }}>{errors.expenseDate}</span>}
+            {errors.expenseDate && <span className="form-error">{errors.expenseDate}</span>}
+          </div>
+
+          {/* Note */}
+          <div className="form-group full-width">
+            <label className="form-label" htmlFor="expense-note">
+              Note (Optional)
+            </label>
+            <textarea 
+              id="expense-note"
+              name="note"
+              className="form-input"
+              value={formData.note}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Add any additional notes here..."
+              disabled={isSubmitting}
+              style={{ resize: 'vertical' }}
+            />
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-          <label style={{ fontSize: '14px', fontWeight: '500' }}>Note (Optional)</label>
-          <textarea 
-            name="note" value={formData.note} onChange={handleChange} rows={3}
-            placeholder="Add any additional notes here..."
-            style={{ padding: '8px', backgroundColor: '#f8fafc', color: '#0f172a', border: '1px solid #cbd5e1', borderRadius: '4px', resize: 'vertical', outline: 'none' }}
-          />
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '12px' }}>
+        <div className="modal-footer" style={{ background: 'transparent', border: 'none', padding: '1rem 0 0' }}>
           {onCancel && (
             <button 
-              type="button" 
+              type="button"
+              className="btn-secondary"
               onClick={onCancel}
-              style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '500' }}
+              disabled={isSubmitting}
             >
               Cancel
             </button>
           )}
           <button 
-            type="submit" 
+            type="submit"
+            className="btn-primary"
             disabled={isSubmitting}
-            style={{ padding: '8px 16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', cursor: isSubmitting ? 'not-allowed' : 'pointer', fontWeight: '500' }}
           >
             {isSubmitting ? 'Saving...' : 'Save Expense'}
           </button>

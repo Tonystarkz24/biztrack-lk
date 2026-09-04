@@ -1,4 +1,4 @@
-﻿import api from './api';
+import api from './api';
 
 const salesService = {
   // GET /api/sales  (supports filters: date, paymentMethod, status)
@@ -27,6 +27,18 @@ const salesService = {
   // PATCH /api/sales/:id/cancel
   cancelSale: async (id) => {
     const response = await api.patch(`/sales/${id}/cancel`);
+    return response.data;
+  },
+
+  // PUT /api/sales/:id
+  updateSale: async (id, saleData) => {
+    const response = await api.put(`/sales/${id}`, saleData);
+    return response.data;
+  },
+
+  // DELETE /api/sales/:id
+  deleteSale: async (id) => {
+    const response = await api.delete(`/sales/${id}`);
     return response.data;
   },
 

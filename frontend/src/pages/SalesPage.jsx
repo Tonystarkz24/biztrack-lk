@@ -67,6 +67,16 @@ function SalesPage() {
     loadProducts();         // restore stock visible in selector
   };
 
+  const handleSaleUpdated = () => {
+    loadSales(filters);
+  };
+
+  const handleSaleDeleted = () => {
+    setSelectedSaleId(null);
+    loadSales(filters);
+    loadProducts();
+  };
+
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
     loadSales(newFilters);
@@ -118,6 +128,8 @@ function SalesPage() {
           saleId={selectedSaleId}
           onClose={() => setSelectedSaleId(null)}
           onCancelled={handleSaleCancelled}
+          onUpdated={handleSaleUpdated}
+          onDeleted={handleSaleDeleted}
           showNotification={showNotification}
         />
       )}

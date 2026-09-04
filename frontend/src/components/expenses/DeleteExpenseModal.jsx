@@ -20,50 +20,47 @@ const DeleteExpenseModal = ({ expense, onClose, onSuccess }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '24px',
-        borderRadius: '8px',
-        width: '90%',
-        maxWidth: '400px',
-        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'
-      }}>
-        <h3 style={{ marginTop: 0, color: '#0f172a' }}>Delete Expense</h3>
-        
-        <p style={{ color: '#475569', marginBottom: '24px' }}>
-          Are you sure you want to delete the expense <strong>{expense.title}</strong>? 
-          This action cannot be undone.
-        </p>
-
-        {error && (
-          <div style={{ backgroundColor: '#fef2f2', color: '#b91c1c', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
-            {error}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <button 
+    <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget && !isDeleting) onClose(); }}>
+      <div className="modal-dialog" style={{ maxWidth: '440px' }} role="dialog" aria-modal="true">
+        <div className="modal-header">
+          <h3 className="modal-title" style={{ color: '#f87171' }}>Delete Expense</h3>
+          <button
+            type="button"
+            className="modal-close-btn"
             onClick={onClose}
             disabled={isDeleting}
-            style={{ padding: '8px 16px', backgroundColor: '#f1f5f9', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            ×
+          </button>
+        </div>
+        <div className="modal-body">
+          <p style={{ color: '#e2e8f0', fontSize: '0.95rem', lineHeight: '1.6' }}>
+            Are you sure you want to delete the expense <strong>{expense.title}</strong>? 
+            This action cannot be undone.
+          </p>
+
+          {error && (
+            <div className="toast-banner error" style={{ marginTop: '1rem' }}>
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
+        <div className="modal-footer">
+          <button 
+            type="button"
+            className="btn-secondary"
+            onClick={onClose}
+            disabled={isDeleting}
           >
             Cancel
           </button>
           <button 
+            type="button"
+            className="btn-danger"
             onClick={handleDelete}
             disabled={isDeleting}
-            style={{ padding: '8px 16px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: isDeleting ? 'not-allowed' : 'pointer' }}
           >
-            {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+            {isDeleting ? 'Deleting...' : 'Delete Expense'}
           </button>
         </div>
       </div>

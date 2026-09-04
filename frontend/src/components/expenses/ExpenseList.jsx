@@ -3,72 +3,92 @@ import React from 'react';
 const ExpenseList = ({ expenses, isLoading, onEdit, onDeleteClick }) => {
   if (isLoading) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-        Loading expenses...
+      <div className="table-card">
+        <div className="loading-state">
+          <div className="spinner" />
+          <p>Loading expense records...</p>
+        </div>
       </div>
     );
   }
 
   if (expenses.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '40px', backgroundColor: '#f8fafc', borderRadius: '8px', color: '#64748b', border: '1px dashed #cbd5e1' }}>
-        No expenses found matching your criteria.
+      <div className="table-card">
+        <div className="empty-state">
+          <div className="empty-icon" role="img" aria-label="no expenses">💸</div>
+          <h3 className="empty-title">No expenses found</h3>
+          <p className="empty-desc">No expenses match the selected filters. Try clearing filters or add a new expense.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
-            <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Date</th>
-            <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Title</th>
-            <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Category</th>
-            <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Amount</th>
-            <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155' }}>Note</th>
-            <th style={{ padding: '12px 16px', fontWeight: 600, color: '#334155', textAlign: 'center' }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expenses.map((expense) => (
-            <tr key={expense.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background-color 0.2s' }}>
-              <td style={{ padding: '12px 16px', color: '#475569' }}>
-                {new Date(expense.expense_date).toLocaleDateString()}
-              </td>
-              <td style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a' }}>{expense.title}</td>
-              <td style={{ padding: '12px 16px' }}>
-                <span style={{ 
-                  backgroundColor: '#e0e7ff', color: '#3730a3', 
-                  padding: '4px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 500 
-                }}>
-                  {expense.category}
-                </span>
-              </td>
-              <td style={{ padding: '12px 16px', fontWeight: 600, color: '#0f172a' }}>
-                Rs. {Number(expense.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-              </td>
-              <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {expense.note || '-'}
-              </td>
-              <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                <button 
-                  onClick={() => onEdit(expense)}
-                  style={{ marginRight: '8px', padding: '6px 12px', backgroundColor: '#f59e0b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Edit
-                </button>
-                <button 
-                  onClick={() => onDeleteClick(expense)}
-                  style={{ padding: '6px 12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Delete
-                </button>
-              </td>
+    <div className="table-card">
+      <div className="table-responsive">
+        <table className="products-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Note</th>
+              <th style={{ textAlign: 'center' }}>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {expenses.map((expense) => (
+              <tr key={expense.id}>
+                <td>
+                  <span style={{ color: 'var(--text-secondary)' }}>
+                    {new Date(expense.expense_date).toLocaleDateString()}
+                  </span>
+                </td>
+                <td>
+                  <span className="product-name">{expense.title}</span>
+                </td>
+                <td>
+                  <span className="badge category">{expense.category}</span>
+                </td>
+                <td>
+                  <span style={{ fontWeight: 600, color: '#f87171' }}>
+                    LKR {Number(expense.amount).toLocaleString('en-LK', { minimumFractionDigits: 2 })}
+                  </span>
+                </td>
+                <td>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', maxWidth: '200px', display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {expense.note || '—'}
+                  </span>
+                </td>
+                <td>
+                  <div className="action-buttons" style={{ justifyContent: 'center' }}>
+                    <button
+                      type="button"
+                      className="btn-icon"
+                      onClick={() => onEdit(expense)}
+                      title="Edit Expense"
+                      aria-label="Edit Expense"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-icon danger"
+                      onClick={() => onDeleteClick(expense)}
+                      title="Delete Expense"
+                      aria-label="Delete Expense"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

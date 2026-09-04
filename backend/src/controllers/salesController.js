@@ -150,4 +150,124 @@ const cancelSale = async (req, res) => {
   }
 };
 
-module.exports = { getSales, getSaleById, createSale, cancelSale };
+// PUT /api/sales/:id
+const updateSale = async (req, res) => {
+  const { id } = req.params;
+  const { customerName, paymentMethod, status } = req.body;
+
+  const validMethods = ['cash', 'card', 'bank_transfer'];
+  if (paymentMethod && !validMethods.includes(paymentMethod)) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid payment method. Allowed: ${validMethods.join(', ')}`
+    });
+  }
+
+  const validStatuses = ['completed', 'cancelled'];
+  if (status && !validStatuses.includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid status. Allowed: ${validStatuses.join(', ')}`
+    });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const existingResult = await client.query('SELECT * FROM sales WHERE id = $1 FOR UPDATE', [id]);
+    if (existingResult.rows.length === 0) {
+      throw { status: 404, message: 'Sale not found' };
+    }
+    const currentSale = existingResult.rows[0];
+
+    // If status is transitioning
+    if (status && status !== currentSale.status) {
+      if (status === 'cancelled' && currentSale.status === 'completed') {
+        // Restore stock
+        const itemsResult = await client.query('SELECT product_id, quantity FROM sale_items WHERE sale_id = $1', [id]);
+        for (const item of itemsResult.rows) {
+          await client.query('UPDATE products SET stock_quantity = stock_quantity + $1 WHERE id = $2', [item.quantity, item.product_id]);
+        }
+      } else if (status === 'completed' && currentSale.status === 'cancelled') {
+        // Re-deduct stock with validation
+        const itemsResult = await client.query('SELECT product_id, quantity FROM sale_items WHERE sale_id = $1', [id]);
+        for (const item of itemsResult.rows) {
+          const prodResult = await client.query('SELECT name, stock_quantity FROM products WHERE id = $1 FOR UPDATE', [item.product_id]);
+          if (prodResult.rows.length === 0) throw { status: 404, message: `Product ${item.product_id} not found` };
+          const p = prodResult.rows[0];
+          if (p.stock_quantity < item.quantity) {
+            throw { status: 400, message: `Insufficient stock for "${p.name}". Available: ${p.stock_quantity}, Required: ${item.quantity}` };
+          }
+          await client.query('UPDATE products SET stock_quantity = stock_quantity - $1 WHERE id = $2', [item.quantity, item.product_id]);
+        }
+      }
+    }
+
+    const updatedCustomerName = customerName !== undefined ? (customerName ? customerName.trim() : null) : currentSale.customer_name;
+    const updatedPaymentMethod = paymentMethod || currentSale.payment_method;
+    const updatedStatus = status || currentSale.status;
+
+    const updateResult = await client.query(
+      `UPDATE sales
+       SET customer_name = $1, payment_method = $2, status = $3
+       WHERE id = $4
+       RETURNING *`,
+      [updatedCustomerName, updatedPaymentMethod, updatedStatus, id]
+    );
+
+    await client.query('COMMIT');
+    return res.status(200).json({
+      success: true,
+      message: 'Sale updated successfully',
+      data: updateResult.rows[0]
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('[updateSale]', err);
+    if (err.status) return res.status(err.status).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: 'Failed to update sale' });
+  } finally {
+    client.release();
+  }
+};
+
+// DELETE /api/sales/:id
+const deleteSale = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const saleResult = await client.query('SELECT * FROM sales WHERE id = $1 FOR UPDATE', [id]);
+    if (saleResult.rows.length === 0) {
+      throw { status: 404, message: 'Sale not found' };
+    }
+    const sale = saleResult.rows[0];
+
+    // If the sale was completed, restore stock back to inventory
+    if (sale.status === 'completed') {
+      const itemsResult = await client.query('SELECT product_id, quantity FROM sale_items WHERE sale_id = $1', [id]);
+      for (const item of itemsResult.rows) {
+        await client.query('UPDATE products SET stock_quantity = stock_quantity + $1 WHERE id = $2', [item.quantity, item.product_id]);
+      }
+    }
+
+    // ON DELETE CASCADE automatically removes sale_items
+    await client.query('DELETE FROM sales WHERE id = $1', [id]);
+    await client.query('COMMIT');
+
+    return res.status(200).json({
+      success: true,
+      message: 'Sale deleted successfully',
+      data: { id: sale.id }
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('[deleteSale]', err);
+    if (err.status) return res.status(err.status).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: 'Failed to delete sale' });
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = { getSales, getSaleById, createSale, cancelSale, updateSale, deleteSale };
