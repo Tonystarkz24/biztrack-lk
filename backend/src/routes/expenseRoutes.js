@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const expenseController = require('../controllers/expenseController');
 
-// Expenses route stub - to be populated by Member 3
-router.get('/', (req, res) => {
-  res.json({ success: true, data: [], message: 'Expenses endpoint ready' });
-});
+router.get('/', expenseController.getAllExpenses);
+router.get('/:id', expenseController.getExpenseById);
+router.post('/', expenseController.createExpense);
+router.put('/:id', expenseController.updateExpense);
+router.delete('/:id', expenseController.deleteExpense);
 
 module.exports = router;
