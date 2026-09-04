@@ -1,6 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import ApiStatusBanner from './components/ApiStatusBanner';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import InventoryPage from './pages/InventoryPage';
@@ -11,6 +12,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="app-layout">
+        <ApiStatusBanner />
         <Navbar />
         <main className="main-content">
           <Routes>

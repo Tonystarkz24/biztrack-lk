@@ -39,7 +39,28 @@ const corsOptions = {
   credentials: true
 };
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
+
+// Informational Root Route (so Railway URL shows a friendly status instead of 404)
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'BizTrack LK Backend API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      dashboard: '/api/dashboard',
+      products: '/api/products',
+      sales: '/api/sales',
+      expenses: '/api/expenses'
+    }
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // API Routes
 app.use('/api/health', healthRoutes);
