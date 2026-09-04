@@ -1,4 +1,4 @@
-﻿/* ====================================================================
+/* ====================================================================
    SALES MODULE STYLES
    Matches the dark design system in global.css
    ==================================================================== */
@@ -106,11 +106,26 @@
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
+  background-color: #0f172a;
+  color: var(--text-primary);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
   background-size: 1.2rem;
   padding-right: 2rem;
+}
+
+.form-input--select option,
+select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 8px 12px;
+}
+
+.form-input--select option:checked,
+select option:checked {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
 }
 
 .form-input--sm {

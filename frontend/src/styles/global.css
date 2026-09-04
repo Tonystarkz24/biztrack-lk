@@ -607,3 +607,23 @@ body {
   color: var(--text-secondary);
   font-size: 0.95rem;
 }
+
+/* Universal Select & Dropdown Styling */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 8px 12px;
+}
+
+select option:checked {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+select option:hover {
+  background-color: #1e293b !important;
+}
