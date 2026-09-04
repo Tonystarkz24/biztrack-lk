@@ -37,7 +37,7 @@ const getDashboardSummary = async (req, res, next) => {
          FROM sale_items si
          JOIN sales s ON si.sale_id = s.id
          LEFT JOIN products p ON si.product_id = p.id
-         WHERE LOWER(COALESCE(status, 'completed')) != 'cancelled'
+         WHERE LOWER(COALESCE(s.status, 'completed')) != 'cancelled'
            AND ($1::date IS NULL OR DATE(COALESCE(s.sold_at, s.created_at, NOW())) = $1::date)`,
         [dateFilter]
       );

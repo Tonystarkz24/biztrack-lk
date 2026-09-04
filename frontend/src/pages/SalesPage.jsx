@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import SaleForm from "../components/sales/SaleForm";
 import SalesHistory from "../components/sales/SalesHistory";
 import SaleDetailsModal from "../components/sales/SaleDetailsModal";
@@ -13,11 +13,12 @@ function SalesPage() {
   const [loadingSales, setLoadingSales]   = useState(true);
   const [notification, setNotification]   = useState(null);
   const [filters, setFilters]             = useState({ date: "", paymentMethod: "", status: "" });
+  const notificationTimer = useRef(null);
 
   const showNotification = useCallback((message, type) => {
+    if (notificationTimer.current) clearTimeout(notificationTimer.current);
     setNotification({ message, type });
-    const t = setTimeout(() => setNotification(null), 4500);
-    return () => clearTimeout(t);
+    notificationTimer.current = setTimeout(() => setNotification(null), 4500);
   }, []);
 
   const loadProducts = useCallback(async () => {

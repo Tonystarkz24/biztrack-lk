@@ -106,8 +106,8 @@ const createSale = async (req, res) => {
     const sale = saleResult.rows[0];
     for (const item of saleItems) {
       await client.query(
-        'INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, unit_cost, line_total) VALUES ($1,$2,$3,$4,$5,$6)',
-        [sale.id, item.productId, item.quantity, item.unitPrice, item.unitCost, item.lineTotal]
+        'INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, unit_cost) VALUES ($1,$2,$3,$4,$5)',
+        [sale.id, item.productId, item.quantity, item.unitPrice, item.unitCost]
       );
       await client.query('UPDATE products SET stock_quantity = stock_quantity - $1 WHERE id = $2', [item.quantity, item.productId]);
     }

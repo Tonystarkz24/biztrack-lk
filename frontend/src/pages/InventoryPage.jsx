@@ -119,15 +119,21 @@ function InventoryPage() {
   };
 
   const handleFormSubmit = async (formData) => {
-    if (editingProduct && editingProduct.id) {
-      await productService.update(editingProduct.id, formData);
-      showToast(`Product "${formData.name}" updated successfully!`, 'success');
-    } else {
-      await productService.create(formData);
-      showToast(`Product "${formData.name}" created successfully!`, 'success');
+    try {
+      if (editingProduct && editingProduct.id) {
+        await productService.update(editingProduct.id, formData);
+        showToast(`Product "${formData.name}" updated successfully!`, 'success');
+      } else {
+        await productService.create(formData);
+        showToast(`Product "${formData.name}" created successfully!`, 'success');
+      }
+      handleCloseModal();
+      fetchProducts();
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to save product';
+      showToast(errorMsg, 'error');
+      throw err; // re-throw so ProductForm can also handle it
     }
-    handleCloseModal();
-    fetchProducts();
   };
 
   const handleToggleStatus = async (product) => {

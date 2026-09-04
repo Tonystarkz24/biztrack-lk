@@ -16,7 +16,7 @@ function SaleDetailsModal({ saleId, onClose, onCancelled, showNotification }) {
       })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [saleId]);
+  }, [saleId, showNotification, onClose]);
 
   const handleCancel = async () => {
     if (!window.confirm("Cancel this sale? Stock will be fully restored.")) return;
@@ -69,7 +69,7 @@ function SaleDetailsModal({ saleId, onClose, onCancelled, showNotification }) {
               </div>
               <div className="sale-detail-item">
                 <span className="sale-detail-label">Date</span>
-                <span className="sale-detail-value">{new Date(sale.created_at).toLocaleString()}</span>
+                <span className="sale-detail-value">{new Date(sale.sold_at || sale.created_at).toLocaleString()}</span>
               </div>
               <div className="sale-detail-item">
                 <span className="sale-detail-label">Total</span>

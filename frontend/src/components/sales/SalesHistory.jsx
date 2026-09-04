@@ -1,4 +1,4 @@
-﻿// SalesHistory – filterable list of past sales
+// SalesHistory – filterable list of past sales
 function SalesHistory({ sales, loading, filters, onFilterChange, onViewSale }) {
   const change = (key, val) => onFilterChange({ ...filters, [key]: val });
   const hasFilters = filters.date || filters.paymentMethod || filters.status;
@@ -37,7 +37,7 @@ function SalesHistory({ sales, loading, filters, onFilterChange, onViewSale }) {
           <option value="">All Methods</option>
           <option value="cash">Cash</option>
           <option value="card">Card</option>
-          <option value="transfer">Transfer</option>
+          <option value="bank_transfer">Bank Transfer</option>
         </select>
         <select
           id="filter-status"
@@ -89,7 +89,7 @@ function SalesHistory({ sales, loading, filters, onFilterChange, onViewSale }) {
                 <div className="sale-card__meta">
                   <span className="sale-card__method">{sale.payment_method}</span>
                   <span className="sale-card__date">
-                    {new Date(sale.created_at).toLocaleString()}
+                    {new Date(sale.sold_at || sale.created_at).toLocaleString()}
                   </span>
                 </div>
                 <span className="sale-card__total">

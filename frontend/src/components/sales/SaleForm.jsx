@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import SaleItemRow from "./SaleItemRow";
 import SaleSummary from "./SaleSummary";
 import salesService from "../../services/salesService";
@@ -96,7 +96,7 @@ function SaleForm({ products, loadingProducts, onSaleCreated, showNotification }
       <div className="form-group">
         <label className="form-label">Payment Method</label>
         <div className="payment-toggle">
-          {[["cash","💵"],["card","💳"],["transfer","🏦"]].map(([m, icon]) => (
+          {[["cash","💵"],["card","💳"],["bank_transfer","🏦"]].map(([m, icon]) => (
             <button
               key={m}
               id={`payment-method-${m}`}

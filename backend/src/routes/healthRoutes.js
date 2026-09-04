@@ -8,7 +8,6 @@ const healthResponse = (req, res) => {
   });
 };
 
-router.get('/health', healthResponse);
 router.get('/', healthResponse);
 
 module.exports = router;

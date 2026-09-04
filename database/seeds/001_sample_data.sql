@@ -19,7 +19,7 @@ ON CONFLICT (sku) DO NOTHING;
 
 -- Insert sample business expenses (only if not already recorded)
 INSERT INTO expenses (title, category, amount, expense_date, note)
-SELECT 'Shop Electricity Bill', 'Utilities', 14850.00, CURRENT_DATE, 'Monthly CEB electricity bill for retail shop'
+SELECT 'Shop Electricity Bill', 'Electricity', 14850.00, CURRENT_DATE, 'Monthly CEB electricity bill for retail shop'
 WHERE NOT EXISTS (
     SELECT 1 FROM expenses WHERE title = 'Shop Electricity Bill' AND expense_date = CURRENT_DATE
 );
@@ -31,7 +31,7 @@ WHERE NOT EXISTS (
 );
 
 INSERT INTO expenses (title, category, amount, expense_date, note)
-SELECT 'Stock Delivery & Transport', 'Logistics', 5500.00, CURRENT_DATE, 'Three-wheeler transport fee for market wholesale goods'
+SELECT 'Stock Delivery & Transport', 'Transport', 5500.00, CURRENT_DATE, 'Three-wheeler transport fee for market wholesale goods'
 WHERE NOT EXISTS (
     SELECT 1 FROM expenses WHERE title = 'Stock Delivery & Transport' AND expense_date = CURRENT_DATE
 );
