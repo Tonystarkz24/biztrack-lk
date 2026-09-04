@@ -1,12 +1,10 @@
+import ExpensesPage from './pages/ExpensesPage';
+
 function App() {
   return (
-    <main className="setup-container">
-      <span className="setup-badge">BizTrack LK</span>
-      <h1 className="setup-title">Project setup completed</h1>
-      <p className="setup-desc">
-        Initial full-stack project skeleton is ready. Team members should branch off <code>main</code> for feature development.
-      </p>
-    </main>
+    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', padding: '20px', colorScheme: 'light', color: '#0f172a' }}>
+      <ExpensesPage />
+    </div>
   );
 }
 
