@@ -148,13 +148,8 @@ function InventoryPage() {
       showToast('Product deleted successfully', 'success');
       fetchProducts();
     } catch (err) {
-      const status = err.response?.status;
       const errorMsg = err.response?.data?.message || err.message || 'Failed to delete product';
-      if (status === 409) {
-        showToast(errorMsg, 'error');
-      } else {
-        showToast(errorMsg, 'error');
-      }
+      showToast(errorMsg, 'error');
     }
   };
 
