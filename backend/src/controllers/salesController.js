@@ -1,4 +1,4 @@
-﻿const pool = require('../config/database');
+const pool = require('../config/database');
 
 // GET /api/sales
 const getSales = async (req, res) => {
@@ -7,7 +7,7 @@ const getSales = async (req, res) => {
     let query = `
       SELECT
         s.id, s.customer_name, s.payment_method, s.status,
-        s.total_amount, s.total_cost, s.created_at,
+        s.total_amount, s.sold_at,
         COUNT(si.id)::int AS item_count
       FROM sales s
       LEFT JOIN sale_items si ON s.id = si.sale_id
@@ -15,10 +15,10 @@ const getSales = async (req, res) => {
     `;
     const params = [];
     let idx = 1;
-    if (date)          { query += ` AND DATE(s.created_at) = $${idx++}`; params.push(date); }
+    if (date)          { query += ` AND DATE(s.sold_at) = $${idx++}`; params.push(date); }
     if (paymentMethod) { query += ` AND s.payment_method = $${idx++}`; params.push(paymentMethod); }
     if (status)        { query += ` AND s.status = $${idx++}`; params.push(status); }
-    query += ` GROUP BY s.id ORDER BY s.created_at DESC`;
+    query += ` GROUP BY s.id ORDER BY s.sold_at DESC`;
     const result = await pool.query(query, params);
     return res.status(200).json({ success: true, message: 'Sales retrieved successfully', data: result.rows });
   } catch (err) {
@@ -36,7 +36,7 @@ const getSaleById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Sale not found' });
     }
     const itemsResult = await pool.query(
-      `SELECT si.id, si.product_id, si.quantity, si.unit_price, si.unit_cost, si.subtotal, p.name AS product_name
+      `SELECT si.id, si.product_id, si.quantity, si.unit_price, si.unit_cost, si.line_total, p.name AS product_name
        FROM sale_items si JOIN products p ON si.product_id = p.id WHERE si.sale_id = $1`,
       [id]
     );
@@ -79,7 +79,7 @@ const createSale = async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    let totalAmount = 0, totalCost = 0;
+    let totalAmount = 0;
     const saleItems = [];
     for (const item of deduped) {
       const prodResult = await client.query(
@@ -95,20 +95,19 @@ const createSale = async (req, res) => {
       };
       const unitPrice = parseFloat(p.selling_price);
       const unitCost  = parseFloat(p.cost_price);
-      const subtotal  = unitPrice * item.quantity;
-      totalAmount += subtotal;
-      totalCost   += unitCost * item.quantity;
-      saleItems.push({ productId: item.productId, quantity: item.quantity, unitPrice, unitCost, subtotal });
+      const lineTotal = unitPrice * item.quantity;
+      totalAmount += lineTotal;
+      saleItems.push({ productId: item.productId, quantity: item.quantity, unitPrice, unitCost, lineTotal });
     }
     const saleResult = await client.query(
-      "INSERT INTO sales (customer_name, payment_method, total_amount, total_cost, status, created_at) VALUES ($1,$2,$3,$4,'completed',NOW()) RETURNING *",
-      [customerName || null, paymentMethod, totalAmount, totalCost]
+      "INSERT INTO sales (customer_name, payment_method, total_amount, status) VALUES ($1,$2,$3,'completed') RETURNING *",
+      [customerName || null, paymentMethod, totalAmount]
     );
     const sale = saleResult.rows[0];
     for (const item of saleItems) {
       await client.query(
-        'INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, unit_cost, subtotal) VALUES ($1,$2,$3,$4,$5,$6)',
-        [sale.id, item.productId, item.quantity, item.unitPrice, item.unitCost, item.subtotal]
+        'INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, unit_cost, line_total) VALUES ($1,$2,$3,$4,$5,$6)',
+        [sale.id, item.productId, item.quantity, item.unitPrice, item.unitCost, item.lineTotal]
       );
       await client.query('UPDATE products SET stock_quantity = stock_quantity - $1 WHERE id = $2', [item.quantity, item.productId]);
     }

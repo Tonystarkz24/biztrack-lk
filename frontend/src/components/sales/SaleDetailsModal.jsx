@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import salesService from "../../services/salesService";
 
 function SaleDetailsModal({ saleId, onClose, onCancelled, showNotification }) {
@@ -95,7 +95,7 @@ function SaleDetailsModal({ saleId, onClose, onCancelled, showNotification }) {
                       <td>{item.product_name}</td>
                       <td>{item.quantity}</td>
                       <td>LKR {parseFloat(item.unit_price).toFixed(2)}</td>
-                      <td>LKR {parseFloat(item.subtotal).toFixed(2)}</td>
+                      <td>LKR {parseFloat(item.line_total).toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
