@@ -18,6 +18,15 @@ const api = axios.create({
   timeout: 15000
 });
 
+// Request interceptor to attach JWT bearer token if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('biztrack_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Logging interceptor for debugging production issues
 api.interceptors.response.use(
   (response) => response,

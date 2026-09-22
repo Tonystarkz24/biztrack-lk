@@ -11,3 +11,18 @@ backend/.env
 *.log
 .DS_Store
 .vscode/
+
+# .NET ignore
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Flutter ignore
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+*.apk
