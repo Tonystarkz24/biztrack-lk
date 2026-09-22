@@ -193,7 +193,7 @@ class _PosOrderScreenState extends State<PosOrderScreen> {
                 ),
                 const SizedBox(width: 8),
                 IconButton.filled(
-                  style: IconButton.filled(backgroundColor: const Color(0xFF38BDF8)),
+                  style: IconButton.styleFrom(backgroundColor: const Color(0xFF38BDF8)),
                   icon: const Icon(Icons.qr_code_scanner, color: Colors.black),
                   onPressed: _openBarcodeScanner,
                 ),

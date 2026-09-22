@@ -21,7 +21,11 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
         [FromQuery] string? search,
         [FromQuery] string? category,
-        [FromQuery] bool? isActive)
+        [FromQuery] bool? isActive,
+        [FromQuery] string? sortBy = "name",
+        [FromQuery] bool sortDescending = false,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
     {
         var query = _context.Products.AsQueryable();
 
@@ -42,8 +46,32 @@ public class ProductsController : ControllerBase
             query = query.Where(p => p.Category.ToLower() == catLower);
         }
 
+        var totalCount = await query.CountAsync();
+
+        // Dynamic Sorting
+        query = (sortBy?.ToLower()) switch
+        {
+            "price" or "sellingprice" => sortDescending ? query.OrderByDescending(p => p.SellingPrice) : query.OrderBy(p => p.SellingPrice),
+            "cost" or "costprice" => sortDescending ? query.OrderByDescending(p => p.CostPrice) : query.OrderBy(p => p.CostPrice),
+            "stock" or "stockquantity" => sortDescending ? query.OrderByDescending(p => p.StockQuantity) : query.OrderBy(p => p.StockQuantity),
+            "sku" => sortDescending ? query.OrderByDescending(p => p.Sku) : query.OrderBy(p => p.Sku),
+            "createdat" => sortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+            _ => sortDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name)
+        };
+
+        // Pagination
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        Response.Headers["X-Total-Count"] = totalCount.ToString();
+        Response.Headers["X-Page-Number"] = page.ToString();
+        Response.Headers["X-Page-Size"] = pageSize.ToString();
+        Response.Headers["X-Total-Pages"] = totalPages.ToString();
+
         var products = await query
-            .OrderBy(p => p.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(p => ToDto(p))
             .ToListAsync();
 

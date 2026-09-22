@@ -18,13 +18,51 @@ public class SalesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SaleDto>>> GetSales([FromQuery] int limit = 50)
+    public async Task<ActionResult<IEnumerable<SaleDto>>> GetSales(
+        [FromQuery] string? status,
+        [FromQuery] string? paymentMethod,
+        [FromQuery] string? sortBy = "soldat",
+        [FromQuery] bool sortDescending = true,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50,
+        [FromQuery] int? limit = null)
     {
-        var sales = await _context.Sales
+        var query = _context.Sales
             .Include(s => s.Items)
             .ThenInclude(i => i.Product)
-            .OrderByDescending(s => s.SoldAt)
-            .Take(Math.Clamp(limit, 1, 200))
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(s => s.Status.ToLower() == status.Trim().ToLower());
+        }
+
+        if (!string.IsNullOrWhiteSpace(paymentMethod))
+        {
+            query = query.Where(s => s.PaymentMethod.ToLower() == paymentMethod.Trim().ToLower());
+        }
+
+        var totalCount = await query.CountAsync();
+
+        query = (sortBy?.ToLower()) switch
+        {
+            "totalamount" or "amount" => sortDescending ? query.OrderByDescending(s => s.TotalAmount) : query.OrderBy(s => s.TotalAmount),
+            "customer" or "customername" => sortDescending ? query.OrderByDescending(s => s.CustomerName) : query.OrderBy(s => s.CustomerName),
+            _ => sortDescending ? query.OrderByDescending(s => s.SoldAt) : query.OrderBy(s => s.SoldAt)
+        };
+
+        var effectivePageSize = limit.HasValue ? Math.Clamp(limit.Value, 1, 200) : Math.Clamp(pageSize, 1, 100);
+        page = Math.Max(1, page);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)effectivePageSize);
+
+        Response.Headers["X-Total-Count"] = totalCount.ToString();
+        Response.Headers["X-Page-Number"] = page.ToString();
+        Response.Headers["X-Page-Size"] = effectivePageSize.ToString();
+        Response.Headers["X-Total-Pages"] = totalPages.ToString();
+
+        var sales = await query
+            .Skip((page - 1) * effectivePageSize)
+            .Take(effectivePageSize)
             .Select(s => ToDto(s))
             .ToListAsync();
 

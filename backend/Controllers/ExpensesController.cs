@@ -21,7 +21,11 @@ public class ExpensesController : ControllerBase
     public async Task<ActionResult<IEnumerable<ExpenseDto>>> GetExpenses(
         [FromQuery] string? category,
         [FromQuery] string? startDate,
-        [FromQuery] string? endDate)
+        [FromQuery] string? endDate,
+        [FromQuery] string? sortBy = "expensedate",
+        [FromQuery] bool sortDescending = true,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
     {
         var query = _context.Expenses.AsQueryable();
 
@@ -41,9 +45,28 @@ public class ExpensesController : ControllerBase
             query = query.Where(e => e.ExpenseDate <= parsedEndDate);
         }
 
+        var totalCount = await query.CountAsync();
+
+        query = (sortBy?.ToLower()) switch
+        {
+            "amount" => sortDescending ? query.OrderByDescending(e => e.Amount) : query.OrderBy(e => e.Amount),
+            "title" => sortDescending ? query.OrderByDescending(e => e.Title) : query.OrderBy(e => e.Title),
+            "category" => sortDescending ? query.OrderByDescending(e => e.Category) : query.OrderBy(e => e.Category),
+            _ => sortDescending ? query.OrderByDescending(e => e.ExpenseDate).ThenByDescending(e => e.CreatedAt) : query.OrderBy(e => e.ExpenseDate).ThenBy(e => e.CreatedAt)
+        };
+
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        Response.Headers["X-Total-Count"] = totalCount.ToString();
+        Response.Headers["X-Page-Number"] = page.ToString();
+        Response.Headers["X-Page-Size"] = pageSize.ToString();
+        Response.Headers["X-Total-Pages"] = totalPages.ToString();
+
         var expenses = await query
-            .OrderByDescending(e => e.ExpenseDate)
-            .ThenByDescending(e => e.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(e => ToDto(e))
             .ToListAsync();
 

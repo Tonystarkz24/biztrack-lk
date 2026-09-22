@@ -2,7 +2,7 @@ name: BizTrack LK Continuous Integration
 
 on:
   push:
-    branches: [ main, kamsha, pavesh, sathira, subanujan ]
+    branches: [ main, kamsha, pavesh, sathira, subanujan, "feature/**" ]
   pull_request:
     branches: [ main ]
 
@@ -28,8 +28,8 @@ jobs:
       - name: Run Backend & Agentic AI Tests
         run: dotnet test tests/BizTrack.Api.Tests/BizTrack.Api.Tests.csproj --configuration Release --verbosity normal
 
-  frontend-build:
-    name: Frontend Client Verification (React + Vite)
+  frontend-verify:
+    name: Frontend Verification & Tests (React + Vitest)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -46,6 +46,41 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Build Production Frontend Bundle
+      - name: Run React Component & Service Tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Build Production Bundle
         working-directory: frontend
         run: npm run build
+
+  mobile-verify:
+    name: Mobile Verification & Tests (Flutter)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Mobile Dependencies
+        working-directory: mobile
+        run: flutter pub get
+
+      - name: Run Flutter Unit & Widget Tests
+        working-directory: mobile
+        run: flutter test
+
+      - name: Build Android APK
+        working-directory: mobile
+        run: flutter build apk --debug
+
+      - name: Upload Runnable Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: biztrack-mobile-apk
+          path: mobile/build/app/outputs/flutter-apk/app-debug.apk

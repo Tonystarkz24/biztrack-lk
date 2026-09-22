@@ -1,193 +1,190 @@
-# BizTrack LK
+# BizTrack LK 🇱🇰
 
-Initial full-stack project skeleton for BizTrack LK.
-
-> **Notice:** This repository contains only the initial project skeleton. No feature implementations or CRUD operations exist yet. All team members must create and work on separate feature branches and must **not** push directly to `main`.
-
----
-
-## Technology Stack
-
-* **Frontend:** React.js with Vite and JavaScript
-* **Backend:** Node.js with Express.js (CommonJS)
-* **Database:** Neon PostgreSQL (Online Shared Instance)
-* **PostgreSQL Client:** `pg` (node-postgres)
-* **HTTP Client:** Axios
+> **Integrated Full-Stack and Agentic AI Management Platform for Sri Lankan Retail & SME Businesses**  
+> Developed for **SLIIT SE3090 – Software Engineering Frameworks (Assignment 1, 2026)**
 
 ---
 
-## Folder Overview
+## 1. Project Overview & Business Domain
 
-```text
-biztrack-lk/
-├── frontend/                     # Client application (React + Vite)
-│   ├── public/                   # Static assets
-│   ├── src/
-│   │   ├── components/           # Reusable UI components
-│   │   ├── pages/                # Page views
-│   │   ├── services/
-│   │   │   └── api.js            # Axios client with baseURL configuration
-│   │   ├── styles/
-│   │   │   └── global.css        # Global CSS styles
-│   │   ├── App.jsx               # Root React component
-│   │   └── main.jsx              # Vite React entry point
-│   ├── .env.example              # Frontend environment template
-│   ├── package.json              # Frontend dependencies and scripts
-│   ├── package-lock.json         # Locked frontend dependencies
-│   ├── vite.config.js            # Vite configuration
-│   └── index.html                # HTML template
-│
-├── backend/                      # Server application (Express.js)
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── database.js       # Shared Neon PostgreSQL pool configuration
-│   │   ├── controllers/          # Request handler controllers
-│   │   ├── routes/
-│   │   │   └── healthRoutes.js   # Health check route (/api/health)
-│   │   ├── middleware/
-│   │   │   ├── errorHandler.js   # Central error handling middleware
-│   │   │   └── notFound.js       # 404 handler middleware
-│   │   ├── app.js                # Express app setup & middleware wiring
-│   │   └── server.js             # Server listener entry point
-│   ├── .env.example              # Backend environment template
-│   ├── package.json              # Backend dependencies and scripts
-│   └── package-lock.json         # Locked backend dependencies
-│
-├── database/                     # Database assets & scripts
-│   ├── migrations/               # SQL schema migrations
-│   └── seeds/                    # Seed data scripts
-│
-├── .gitignore                    # Git ignore configuration
-└── README.md                     # Project documentation
+**BizTrack LK** is an enterprise-grade, integrated multi-client management system designed specifically for Sri Lankan retail and wholesale grocery merchants. Small and medium enterprises (SMEs) across Sri Lanka traditionally struggle with manual ledger books, untracked procurement costs (COGS), fluctuating supplier prices, and unmonitored stock-outs of critical household staples (such as Samba Rice, Mysoor Dhal, and Ceylon Tea).
+
+BizTrack LK unites **Web Administration**, **Mobile Point-of-Sale (POS)**, a **Secure RESTful API**, an **Online Relational Database**, and an **Autonomous Agentic AI Workflow Engine** into a single cohesive platform.
+
+---
+
+## 2. Integrated System Architecture
+
+```mermaid
+graph TD
+    subgraph Client Tier
+        W[React Web Dashboard<br/><i>Admin, Monitoring & Approval</i>]
+        M[Flutter Mobile App<br/><i>POS Cashier, Barcode Scanner & Mobile Tasks</i>]
+    end
+
+    subgraph Application Tier [ASP.NET Core 8.0 Web API]
+        Auth[JWT Authentication & RBAC]
+        Controllers[Controllers & DTOs<br/><i>Products, Sales, Expenses, Dashboard</i>]
+        Engine[Agentic AI Workflow Engine<br/><i>4-Stage Multi-Agent Pipeline</i>]
+        ThirdParty[Third-Party Currency Service<br/><i>open.er-api.com + In-Memory Cache</i>]
+    end
+
+    subgraph Data Tier
+        DB[(Neon Serverless PostgreSQL)]
+    end
+
+    W -->|HTTPS / REST + JWT| Controllers
+    W -->|Review & Human Approval| Engine
+    M -->|HTTPS / REST + JWT| Controllers
+    M -->|Initiate Task / Barcode Scan| Engine
+    Controllers --> Auth
+    Controllers --> Engine
+    Controllers --> ThirdParty
+    Controllers -->|Entity Framework Core| DB
+    Engine -->|State & Execution Logs| DB
+```
+
+### Key Architectural Standards
+* **Single Backend Rule:** Both React and Flutter clients consume the **exact same ASP.NET Core Web API**, sharing user identities, database models, permissions, and business rules.
+* **Closed Third-Party Routing:** External exchange rate calls (`open.er-api.com`) are routed exclusively through the ASP.NET Core backend with in-memory caching and resilient fallback rates.
+* **Deterministic Safety Boundaries:** High-impact financial commitments ($\ge$ LKR 15,000.00) generated by the Agentic AI automatically pause for human executive sign-off.
+
+---
+
+## 3. Technology Stack
+
+| Layer | Framework / Technology | Version / Tooling |
+| :--- | :--- | :--- |
+| **Backend API** | C# / ASP.NET Core Web API | .NET 8.0, Entity Framework Core, BCrypt.Net, JWT Bearer |
+| **Database** | PostgreSQL | Neon Serverless PostgreSQL with SSL (`sslmode=require`) |
+| **Web Frontend** | React.js (SPA) | React 18, Vite, React Router DOM, Vitest, Context API |
+| **Mobile App** | Flutter & Dart | Flutter 3.x, Provider, Mobile Scanner, Secure Storage |
+| **Agentic AI** | Custom Multi-Agent Engine | C# Deterministic Rules Engine, Allow-listed Tools, Audit Logs |
+| **CI / CD** | GitHub Actions | Automated build, test suites for .NET, React, and Flutter |
+
+---
+
+## 4. User Roles & Security Matrix
+
+BizTrack LK enforces strict **Role-Based Access Control (RBAC)**:
+
+| Role | Username | Password | Key Responsibilities |
+| :--- | :--- | :--- | :--- |
+| **System Admin** | `admin` | `Admin123!` | Executive dashboard, system users, approving/rejecting agent restock workflows. |
+| **Inventory Manager** | `manager` | `Manager123!` | Product catalog management, reorder thresholds, inventory adjustments, and restock planning. |
+| **POS Cashier** | `cashier` | `Cashier123!` | Point-of-sale checkout, customer orders, cash/card collection, and mobile barcode scanning. |
+
+*Default accounts are automatically seeded into the database on API startup.*
+
+---
+
+## 5. Four Primary Business Components (Group Allocation)
+
+In accordance with Section 3 and 4 of the SE3090 specification, four primary business components are implemented:
+
+1. **Component A: Product Catalog & Stock Governance**
+   - CRUD operations, search, category filters, reorder-level alerts, server-side pagination, and stock deficit calculations.
+2. **Component B: Point-of-Sale (POS) & Sales Transaction Processing**
+   - Multi-item checkout, atomic stock decrements inside database transactions, customer invoice generation, payment methods (Cash, Card, Bank Transfer).
+3. **Component C: Operational Expenditures & Financial Tracking**
+   - Categorized operational outflows (Rent, CEB Electricity, Transport), date filtering, pagination, and expenditure audit trails.
+4. **Component D: Executive Analytics & Agentic AI Orchestration**
+   - Real-time gross and net profit computation, 4-agent replenishment pipeline, human-in-the-loop approval gates, and execution logging.
+
+---
+
+## 6. Agentic AI Subsystem Overview
+
+The Agentic AI subsystem is a multi-agent orchestration pipeline ([AgentWorkflowEngine.cs](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/backend/Services/AgentWorkflowEngine.cs)):
+
+```mermaid
+flowchart LR
+    A[Objective] --> B[1. Coordinator / Planner Agent]
+    B --> C[2. Demand Analyzer Agent]
+    C --> D[3. Action Generator Agent]
+    D --> E[4. Validation & Safety Agent]
+    E -->|Budget > LKR 15,000| F[Paused: Requires Human Approval 🛑]
+    E -->|Low Risk & Budget <= LKR 15,000| G[Status: Completed ✅]
+```
+
+1. **`CoordinatorPlannerAgent`:** Deconstructs business objectives into a 3-stage structured plan.
+2. **`DemandAnalyzerAgent`:** Queries database deficits for products where `stock_quantity <= reorder_level`.
+3. **`ActionGeneratorAgent`:** Uses allow-listed pricing tools to formulate concrete restock purchase orders and total LKR budget commitments.
+4. **`ValidationSafetyAgent`:** Enforces deterministic business boundaries. If proposed capital expenditure exceeds **LKR 15,000.00**, it pauses the workflow, flags risk as `High`, and waits for authorized sign-off in the React dashboard.
+
+---
+
+## 7. Architecture Decision Records (ADRs)
+
+Detailed records capturing architectural rationale and alternatives are located in [`docs/adrs/`](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/docs/adrs/):
+- **[ADR-001: React State Management](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/docs/adrs/ADR-001-react-state-management.md)** (Context API + Custom Hooks)
+- **[ADR-002: Flutter State Management](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/docs/adrs/ADR-002-flutter-state-management.md)** (Provider + Secure Storage)
+- **[ADR-003: Agentic AI Orchestration](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/docs/adrs/ADR-003-agentic-ai-orchestration.md)** (Native C# Multi-Agent Engine + Safety Gate)
+- **[ADR-004: PostgreSQL Agent State Schema](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/docs/adrs/ADR-004-postgresql-agent-state-schema.md)** (Normalized Relational Entity Triad)
+- **[ADR-005: Third-Party Currency Service](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/docs/adrs/ADR-005-third-party-currency-service.md)** (Open Exchange Rates API + In-Memory Caching)
+
+---
+
+## 8. Installation & Running Locally
+
+### Prerequisites
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Node.js v18+](https://nodejs.org/)
+- [Flutter SDK 3.x](https://flutter.dev/) (for mobile)
+- Git
+
+### 1. ASP.NET Core Backend
+```bash
+# Navigate to backend and run
+cd backend
+dotnet run
+```
+* The API will listen on `http://localhost:5000`.
+* Interactive Swagger API documentation: `http://localhost:5000/swagger`.
+* Health check: `http://localhost:5000/api/health`.
+
+### 2. React Web Client
+```bash
+# Navigate to frontend and start Vite dev server
+cd frontend
+npm install
+npm run dev
+```
+* Web application available at `http://localhost:5173`.
+
+### 3. Flutter Mobile Client
+```bash
+# Navigate to mobile and run
+cd mobile
+flutter pub get
+flutter run
 ```
 
 ---
 
-## Prerequisites
+## 9. Automated Testing & Verification
 
-Ensure you have the following installed on your development machine:
-
-* **Node.js** (v18 or higher recommended)
-* **npm** (v9 or higher recommended)
-* **Git**
-* A **Neon account** (for accessing the online PostgreSQL shared database)
-
----
-
-## Shared Database Architecture
-
-All four team members connect to the **same shared Neon PostgreSQL online database**.
-* The database connection string is managed via the `DATABASE_URL` environment variable.
-* Team members will receive the connection string securely from the project lead.
-* Do **not** hardcode connection strings anywhere in code.
-
----
-
-## Environment Setup & Security Warning
-
-> ⚠️ **CRITICAL SECURITY WARNING:** Never commit or push `.env` files to GitHub. Only `.env.example` templates are tracked by Git.
-
-### 1. Backend Environment Setup
-
-Create a `.env` file in the `backend/` directory by copying `.env.example`:
+Automated test suites cover all layers of the platform:
 
 ```bash
-# Windows (PowerShell)
-Copy-Item backend/.env.example backend/.env
+# 1. Run Backend & Agentic AI Tests (9 passing tests)
+dotnet test tests/BizTrack.Api.Tests/BizTrack.Api.Tests.csproj
 
-# macOS / Linux
-cp backend/.env.example backend/.env
-```
+# 2. Run React Web Tests (6 passing tests)
+cd frontend && npm test
 
-Open `backend/.env` and insert your values:
-```env
-PORT=5000
-NODE_ENV=development
-DATABASE_URL=postgresql://<user>:<password>@<neon-host>/<dbname>?sslmode=require
-FRONTEND_URL=http://localhost:5173
-```
+# 3. Run Flutter Mobile Tests (4 passing tests)
+cd mobile && flutter test
 
-### 2. Frontend Environment Setup
-
-Create a `.env` file in the `frontend/` directory by copying `.env.example`:
-
-```bash
-# Windows (PowerShell)
-Copy-Item frontend/.env.example frontend/.env
-
-# macOS / Linux
-cp frontend/.env.example frontend/.env
-```
-
-Contents of `frontend/.env`:
-```env
-VITE_API_URL=http://localhost:5000/api
+# 4. Run Concurrent Performance Benchmark
+node tests/performance/benchmark.js
 ```
 
 ---
 
-## Installation & Running Locally
+## 10. Continuous Integration (CI)
 
-### Backend Setup
-
-1. Open a terminal and navigate to the `backend` directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the development server (with hot reload via nodemon):
-   ```bash
-   npm run dev
-   ```
-   Or run the production server:
-   ```bash
-   npm start
-   ```
-4. Verify backend health endpoint by navigating to:
-   ```text
-   http://localhost:5000/api/health
-   ```
-   Expected response:
-   ```json
-   {
-     "success": true,
-     "message": "Backend server is running"
-   }
-   ```
-
-### Frontend Setup
-
-1. Open another terminal and navigate to the `frontend` directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-4. Open your browser and visit:
-   ```text
-   http://localhost:5173
-   ```
-5. To test building the frontend for production:
-   ```bash
-   npm run build
-   ```
-
----
-
-## Branching & Contribution Guidelines
-
-1. **Do not push directly to `main`**: The `main` branch is protected and holds the stable skeleton.
-2. **Create feature branches**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. **Commit often with descriptive messages**: Ensure all linting and build checks pass before opening a Pull Request.
+The repository is equipped with an automated GitHub Actions CI pipeline ([`.github/workflows/ci.yml`](file:///c:/Users/vasan/OneDrive/Desktop/biztrack-lk/.github/workflows/ci.yml)):
+- Builds the ASP.NET Core Web API in `Release` mode and executes xUnit tests.
+- Verifies the React client using Vitest and builds the production bundle (`npm run build`).
+- Sets up Flutter SDK and runs `flutter test`.
