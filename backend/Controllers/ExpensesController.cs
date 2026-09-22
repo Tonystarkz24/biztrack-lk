@@ -1,11 +1,13 @@
 using BizTrack.Api.Data;
 using BizTrack.Api.DTOs;
 using BizTrack.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BizTrack.Api.Controllers;
 
+[Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
 [ApiController]
 [Route("api/[controller]")]
 public class ExpensesController : ControllerBase
@@ -117,6 +119,7 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<ExpenseDto>> CreateExpense([FromBody] CreateExpenseDto dto)
     {
         var expenseDate = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -143,6 +146,7 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<ExpenseDto>> UpdateExpense(long id, [FromBody] UpdateExpenseDto dto)
     {
         var expense = await _context.Expenses.FindAsync(id);
@@ -167,6 +171,7 @@ public class ExpensesController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> DeleteExpense(long id)
     {
         var expense = await _context.Expenses.FindAsync(id);

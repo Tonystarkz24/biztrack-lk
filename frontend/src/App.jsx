@@ -11,6 +11,8 @@ import ExpensesPage from './pages/ExpensesPage';
 import AgentWorkflowsPage from './pages/AgentWorkflowsPage';
 import LoginPage from './pages/LoginPage';
 
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <AuthProvider>
@@ -21,12 +23,48 @@ function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/inventory" element={<InventoryPage />} />
-              <Route path="/sales" element={<SalesPage />} />
-              <Route path="/expenses" element={<ExpensesPage />} />
-              <Route path="/agent-workflows" element={<AgentWorkflowsPage />} />
               <Route path="/login" element={<LoginPage />} />
+              
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute allowedRoles={['Admin', 'InventoryManager']}>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/inventory"
+                element={
+                  <ProtectedRoute allowedRoles={['Admin', 'InventoryManager', 'Cashier']}>
+                    <InventoryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sales"
+                element={
+                  <ProtectedRoute allowedRoles={['Admin', 'Cashier']}>
+                    <SalesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/expenses"
+                element={
+                  <ProtectedRoute allowedRoles={['Admin']}>
+                    <ExpensesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/agent-workflows"
+                element={
+                  <ProtectedRoute allowedRoles={['Admin', 'InventoryManager']}>
+                    <AgentWorkflowsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<HomePage />} />
             </Routes>
           </main>

@@ -126,22 +126,28 @@ const AgentWorkflowsPage = () => {
       )}
 
       {/* Trigger New Workflow Form */}
-      <div className="card workflow-init-card">
-        <h3>🚀 Dispatch Autonomous Workflow</h3>
-        <form onSubmit={handleInitiateWorkflow} className="workflow-init-form">
-          <input
-            type="text"
-            className="input-field"
-            value={objectiveInput}
-            onChange={(e) => setObjectiveInput(e.target.value)}
-            placeholder="Enter business objective (e.g. Audit low stock, replenish inventory)..."
-            required
-          />
-          <button type="submit" className="btn btn-primary" disabled={actionLoading}>
-            {actionLoading ? 'Executing Agents...' : 'Dispatch Workflow'}
-          </button>
-        </form>
-      </div>
+      {['Admin', 'InventoryManager'].includes(user?.role) ? (
+        <div className="card workflow-init-card">
+          <h3>🚀 Dispatch Autonomous Workflow</h3>
+          <form onSubmit={handleInitiateWorkflow} className="workflow-init-form">
+            <input
+              type="text"
+              className="input-field"
+              value={objectiveInput}
+              onChange={(e) => setObjectiveInput(e.target.value)}
+              placeholder="Enter business objective (e.g. Audit low stock, replenish inventory)..."
+              required
+            />
+            <button type="submit" className="btn btn-primary" disabled={actionLoading}>
+              {actionLoading ? 'Executing Agents...' : 'Dispatch Workflow'}
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div className="card" style={{ padding: '1rem', background: '#f8fafc', marginBottom: '1.5rem', color: '#64748b' }}>
+          🔒 Workflow dispatching is restricted to Admins and Inventory Managers.
+        </div>
+      )}
 
       <div className="workflow-grid-layout">
         {/* Left column: Workflows List */}
@@ -197,31 +203,37 @@ const AgentWorkflowsPage = () => {
                     <h4>⚠️ Human-in-the-Loop Review Required</h4>
                     <p>{selectedWorkflow.finalOutcome}</p>
                   </div>
-                  <div className="approval-actions">
-                    <input
-                      type="text"
-                      className="input-field input-sm"
-                      placeholder="Approval or revision note..."
-                      value={decisionNote}
-                      onChange={(e) => setDecisionNote(e.target.value)}
-                    />
-                    <div className="button-group">
-                      <button
-                        className="btn btn-success"
-                        onClick={() => handleDecision('Approved')}
-                        disabled={actionLoading}
-                      >
-                        ✓ Approve Purchase Order
-                      </button>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDecision('Rejected')}
-                        disabled={actionLoading}
-                      >
-                        ✕ Reject
-                      </button>
+                  {user?.role === 'Admin' ? (
+                    <div className="approval-actions">
+                      <input
+                        type="text"
+                        className="input-field input-sm"
+                        placeholder="Approval or revision note..."
+                        value={decisionNote}
+                        onChange={(e) => setDecisionNote(e.target.value)}
+                      />
+                      <div className="button-group">
+                        <button
+                          className="btn btn-success"
+                          onClick={() => handleDecision('Approved')}
+                          disabled={actionLoading}
+                        >
+                          ✓ Approve Purchase Order
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => handleDecision('Rejected')}
+                          disabled={actionLoading}
+                        >
+                          ✕ Reject
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: '#fef3c7', borderRadius: '6px', color: '#92400e', fontSize: '0.9rem' }}>
+                      <strong>🔒 Admin Action Required:</strong> Only users with the <strong>Admin</strong> role are authorized to sign off or reject budget commitments exceeding LKR 15,000.
+                    </div>
+                  )}
                 </div>
               )}
 

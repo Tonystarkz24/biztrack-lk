@@ -1,11 +1,13 @@
 using BizTrack.Api.Data;
 using BizTrack.Api.DTOs;
 using BizTrack.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BizTrack.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class SalesController : ControllerBase
@@ -86,6 +88,7 @@ public class SalesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Cashier}")]
     public async Task<ActionResult<SaleDto>> CreateSale([FromBody] CreateSaleDto dto)
     {
         if (dto.Items == null || dto.Items.Count == 0)

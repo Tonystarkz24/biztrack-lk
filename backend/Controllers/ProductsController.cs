@@ -1,11 +1,13 @@
 using BizTrack.Api.Data;
 using BizTrack.Api.DTOs;
 using BizTrack.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BizTrack.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -103,6 +105,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
     public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto dto)
     {
         if (await _context.Products.AnyAsync(p => p.Sku.ToLower() == dto.Sku.Trim().ToLower()))
@@ -132,6 +135,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:long}")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
     public async Task<ActionResult<ProductDto>> UpdateProduct(long id, [FromBody] UpdateProductDto dto)
     {
         var product = await _context.Products.FindAsync(id);
@@ -165,6 +169,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost("{id:long}/adjust-stock")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
     public async Task<ActionResult<ProductDto>> AdjustStock(long id, [FromBody] StockAdjustmentDto dto)
     {
         var product = await _context.Products.FindAsync(id);
@@ -187,6 +192,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
     public async Task<IActionResult> DeleteProduct(long id)
     {
         var product = await _context.Products.FindAsync(id);

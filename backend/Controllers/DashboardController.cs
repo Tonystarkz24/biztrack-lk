@@ -1,11 +1,13 @@
 using BizTrack.Api.Data;
 using BizTrack.Api.DTOs;
 using BizTrack.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BizTrack.Api.Controllers;
 
+[Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
 [ApiController]
 [Route("api/[controller]")]
 public class DashboardController : ControllerBase

@@ -5,6 +5,22 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BizTrack.Api.Services;
 
+public class RestockRecommendationItem
+{
+    public long Id { get; set; }
+    public string Sku { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public decimal SuggestedOrderQuantity { get; set; }
+    public decimal UnitCostLkr { get; set; }
+    public decimal TotalEstimatedCostLkr { get; set; }
+}
+
+public class RestockActionOutput
+{
+    public List<RestockRecommendationItem> RecommendedPurchaseOrders { get; set; } = new();
+    public decimal TotalCapitalCommitmentLkr { get; set; }
+}
+
 public interface IAgentWorkflowEngine
 {
     Task<AgentWorkflow> RunWorkflowAsync(string objective, string requesterUsername, string requesterRole);
@@ -48,7 +64,7 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
         {
             "1. Analyze low-stock inventory and identify critical stockouts",
             "2. Generate optimal bulk restock recommendations with supplier cost projections",
-            "3. Enforce deterministic budget constraints and require executive sign-off"
+            "3. Enforce deterministic budget constraints and require executive sign-off for orders > LKR 15,000"
         };
         workflow.PlanSummary = string.Join("\n", planSteps);
 
@@ -90,21 +106,59 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
             ToolName = "QueryInventoryDeficits",
             ToolInput = JsonSerializer.Serialize(new { ThresholdRule = "stock <= reorder_level", Limit = 10 }),
             ToolOutput = JsonSerializer.Serialize(new { LowStockItemsFound = deficitList.Count, Items = deficitList }),
-            ValidationResult = $"Passed: Evaluated {deficitList.Count} items needing attention."
+            ValidationResult = deficitList.Count > 0 
+                ? $"Passed: Identified {deficitList.Count} items needing replenishment."
+                : "Passed: All inventory levels are healthy above reorder thresholds."
         };
         _context.AgentExecutionLogs.Add(log2);
         await _context.SaveChangesAsync();
+
+        // If no items need restocking, complete gracefully
+        if (deficitList.Count == 0)
+        {
+            var log3Empty = new AgentExecutionLog
+            {
+                WorkflowId = workflow.Id,
+                StepNumber = step++,
+                AgentRole = "ActionGeneratorAgent",
+                ToolName = "CalculateOptimalRestockOrder",
+                ToolInput = JsonSerializer.Serialize(new { Status = "NoDeficitsDetected" }),
+                ToolOutput = JsonSerializer.Serialize(new { RecommendedPurchaseOrders = Array.Empty<object>(), TotalCapitalCommitmentLkr = 0.00 }),
+                ValidationResult = "Passed: Zero purchase orders required."
+            };
+            _context.AgentExecutionLogs.Add(log3Empty);
+
+            var log4Empty = new AgentExecutionLog
+            {
+                WorkflowId = workflow.Id,
+                StepNumber = step++,
+                AgentRole = "ValidationSafetyAgent",
+                ToolName = "EnforceDeterministicSafetyThresholds",
+                ToolInput = JsonSerializer.Serialize(new { TotalProposedBudget = 0.00, AutonomousThreshold = 15000.00 }),
+                ToolOutput = JsonSerializer.Serialize(new { SafetyDecision = "Completed", RiskLevel = "Low" }),
+                ValidationResult = "Passed: All products are adequately stocked. No approval needed."
+            };
+            _context.AgentExecutionLogs.Add(log4Empty);
+
+            workflow.Status = WorkflowStatus.Completed;
+            workflow.RiskLevel = "Low";
+            workflow.RequiresHumanApproval = false;
+            workflow.FinalOutcome = "All active products are adequately stocked above reorder thresholds. No restock purchase orders needed.";
+            workflow.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return workflow;
+        }
 
         // --- 3. ACTION / TOOL AGENT (Allow-listed restock calculator) ---
         var recommendations = deficitList.Select(d =>
         {
             var suggestedOrderQty = Math.Max(10, Math.Ceiling(d.Deficit > 0 ? d.Deficit : 15));
             var estCost = Math.Round(suggestedOrderQty * d.CostPrice, 2);
-            return new
+            return new RestockRecommendationItem
             {
-                d.Id,
-                d.Sku,
-                d.Name,
+                Id = d.Id,
+                Sku = d.Sku,
+                Name = d.Name,
                 SuggestedOrderQuantity = suggestedOrderQty,
                 UnitCostLkr = d.CostPrice,
                 TotalEstimatedCostLkr = estCost
@@ -120,7 +174,7 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
             AgentRole = "ActionGeneratorAgent",
             ToolName = "CalculateOptimalRestockOrder",
             ToolInput = JsonSerializer.Serialize(new { SourceDeficits = deficitList.Select(d => d.Sku) }),
-            ToolOutput = JsonSerializer.Serialize(new
+            ToolOutput = JsonSerializer.Serialize(new RestockActionOutput
             {
                 RecommendedPurchaseOrders = recommendations,
                 TotalCapitalCommitmentLkr = totalBudgetNeeded
@@ -132,7 +186,7 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
 
         // --- 4. VALIDATION & SAFETY AGENT ---
         // Deterministic check: Is budget commitment high impact (> 15,000 LKR)?
-        bool isHighImpact = totalBudgetNeeded > 15000m || recommendations.Any();
+        bool isHighImpact = totalBudgetNeeded > 15000m;
         string safetyOutcome;
 
         if (isHighImpact)
@@ -145,11 +199,33 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
         }
         else
         {
-            safetyOutcome = "Passed: Order is within autonomous limits. Completed.";
+            // Autonomous low-impact execution: Apply stock and record procurement expense immediately
+            foreach (var rec in recommendations)
+            {
+                var product = await _context.Products.FindAsync(rec.Id);
+                if (product != null)
+                {
+                    product.StockQuantity += rec.SuggestedOrderQuantity;
+                    product.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            _context.Expenses.Add(new Expense
+            {
+                Title = $"Autonomous Restock: {workflow.WorkflowCode}",
+                Category = "Inventory Restock",
+                Amount = totalBudgetNeeded,
+                ExpenseDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                Note = $"Autonomous restock executed by Agent Workflow Engine for {recommendations.Count} products under spending limit.",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            safetyOutcome = $"Passed: Order of LKR {totalBudgetNeeded:N2} is within autonomous limit (<= 15,000). Executed automatically.";
             workflow.Status = WorkflowStatus.Completed;
             workflow.RiskLevel = "Low";
             workflow.RequiresHumanApproval = false;
-            workflow.FinalOutcome = "Autonomous low-risk workflow executed successfully.";
+            workflow.FinalOutcome = $"Autonomous execution completed: Restocked {recommendations.Count} products totaling LKR {totalBudgetNeeded:N2} and logged restock expense.";
         }
 
         var log4 = new AgentExecutionLog
@@ -194,8 +270,55 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
 
         if (decision.Equals("Approved", StringComparison.OrdinalIgnoreCase))
         {
+            // Execute real business transaction: Increment product stock & record procurement expense
+            var actionLog = workflow.ExecutionLogs.FirstOrDefault(l => l.AgentRole == "ActionGeneratorAgent");
+            int itemsUpdated = 0;
+            decimal totalCost = 0m;
+
+            if (actionLog?.ToolOutput != null)
+            {
+                try
+                {
+                    var actionData = JsonSerializer.Deserialize<RestockActionOutput>(actionLog.ToolOutput, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    if (actionData != null && actionData.RecommendedPurchaseOrders.Count > 0)
+                    {
+                        totalCost = actionData.TotalCapitalCommitmentLkr;
+
+                        foreach (var item in actionData.RecommendedPurchaseOrders)
+                        {
+                            var product = await _context.Products.FindAsync(item.Id);
+                            if (product != null)
+                            {
+                                product.StockQuantity += item.SuggestedOrderQuantity;
+                                product.UpdatedAt = DateTime.UtcNow;
+                                itemsUpdated++;
+                            }
+                        }
+
+                        _context.Expenses.Add(new Expense
+                        {
+                            Title = $"Approved Restock Order: {workflow.WorkflowCode}",
+                            Category = "Inventory Restock",
+                            Amount = totalCost,
+                            ExpenseDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            Note = $"Restock order approved by {approverUsername}. Note: {note ?? "None"}",
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to apply approved restock purchase order.");
+                }
+            }
+
             workflow.Status = WorkflowStatus.Approved;
-            workflow.FinalOutcome = $"Approved by {approverUsername}. Dispatched for purchase order execution. Note: {note ?? "None"}";
+            workflow.FinalOutcome = $"Approved by {approverUsername}. Executed purchase order: updated stock for {itemsUpdated} products and logged restock expense of LKR {totalCost:N2}. Note: {note ?? "None"}";
         }
         else
         {

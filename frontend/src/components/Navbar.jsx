@@ -46,41 +46,56 @@ const Navbar = () => {
           >
             🏠 Home
           </NavLink>
-          <NavLink
-            to="/dashboard"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={closeMenu}
-          >
-            📊 Dashboard
-          </NavLink>
-          <NavLink
-            to="/inventory"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={closeMenu}
-          >
-            📦 Inventory
-          </NavLink>
-          <NavLink
-            to="/sales"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={closeMenu}
-          >
-            🧾 Sales
-          </NavLink>
-          <NavLink
-            to="/expenses"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={closeMenu}
-          >
-            💸 Expenses
-          </NavLink>
-          <NavLink
-            to="/agent-workflows"
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            onClick={closeMenu}
-          >
-            🤖 AI Workflows
-          </NavLink>
+
+          {user && ['Admin', 'InventoryManager'].includes(user.role) && (
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              📊 Dashboard
+            </NavLink>
+          )}
+
+          {user && ['Admin', 'InventoryManager', 'Cashier'].includes(user.role) && (
+            <NavLink
+              to="/inventory"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              📦 Inventory
+            </NavLink>
+          )}
+
+          {user && ['Admin', 'Cashier'].includes(user.role) && (
+            <NavLink
+              to="/sales"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              🧾 Sales
+            </NavLink>
+          )}
+
+          {user && ['Admin'].includes(user.role) && (
+            <NavLink
+              to="/expenses"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              💸 Expenses
+            </NavLink>
+          )}
+
+          {user && ['Admin', 'InventoryManager'].includes(user.role) && (
+            <NavLink
+              to="/agent-workflows"
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              onClick={closeMenu}
+            >
+              🤖 AI Workflows
+            </NavLink>
+          )}
 
           <div className="nav-auth-section">
             {user ? (

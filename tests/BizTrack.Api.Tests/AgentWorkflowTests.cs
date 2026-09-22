@@ -23,15 +23,15 @@ public class AgentWorkflowTests
     {
         using var context = GetInMemoryDbContext();
 
-        // Seed an item that is low stock
+        // Seed an item that is low stock and high cost (18 * 1200 = 21,600 > 15,000 threshold)
         context.Products.Add(new Product
         {
             Sku = "DEF-001",
             Name = "Critical Rice Pack",
             Category = "Grains",
             Unit = "kg",
-            CostPrice = 200m,
-            SellingPrice = 260m,
+            CostPrice = 1200m,
+            SellingPrice = 1500m,
             StockQuantity = 2m,
             ReorderLevel = 10m,
             IsActive = true
@@ -66,6 +66,49 @@ public class AgentWorkflowTests
         Assert.Contains("Passed", logs[1].ValidationResult);
         Assert.Contains("Passed", logs[2].ValidationResult);
         Assert.Contains("RequiresHumanApproval", logs[3].ValidationResult);
+    }
+
+    [Fact]
+    public async Task RunWorkflowAsync_LowBudgetDeficit_ExecutesAutonomouslyWithoutApproval()
+    {
+        using var context = GetInMemoryDbContext();
+
+        // Seed a small deficit item (18 * 100 = 1800 <= 15,000)
+        context.Products.Add(new Product
+        {
+            Sku = "DEF-SMALL-001",
+            Name = "Small Spice Pack",
+            Category = "Spices",
+            Unit = "packet",
+            CostPrice = 100m,
+            SellingPrice = 150m,
+            StockQuantity = 2m,
+            ReorderLevel = 10m,
+            IsActive = true
+        });
+        await context.SaveChangesAsync();
+
+        var engine = new AgentWorkflowEngine(context, NullLogger<AgentWorkflowEngine>.Instance);
+
+        var workflow = await engine.RunWorkflowAsync(
+            "Replenish spices inventory",
+            "manager_user",
+            "InventoryManager"
+        );
+
+        Assert.NotNull(workflow);
+        Assert.Equal(WorkflowStatus.Completed, workflow.Status);
+        Assert.False(workflow.RequiresHumanApproval);
+        Assert.Equal("Low", workflow.RiskLevel);
+        Assert.Contains("Autonomous execution completed", workflow.FinalOutcome);
+
+        // Verify stock was automatically incremented
+        var updatedProduct = await context.Products.FirstAsync(p => p.Sku == "DEF-SMALL-001");
+        Assert.True(updatedProduct.StockQuantity > 2m);
+
+        // Verify expense was recorded
+        var expense = await context.Expenses.FirstOrDefaultAsync(e => e.Category == "Inventory Restock");
+        Assert.NotNull(expense);
     }
 
     [Fact]

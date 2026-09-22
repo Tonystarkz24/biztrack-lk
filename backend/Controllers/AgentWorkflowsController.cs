@@ -1,12 +1,15 @@
+using System.Security.Claims;
 using BizTrack.Api.Data;
 using BizTrack.Api.DTOs;
 using BizTrack.Api.Models;
 using BizTrack.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BizTrack.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/agent/workflows")]
 public class AgentWorkflowsController : ControllerBase
@@ -48,6 +51,7 @@ public class AgentWorkflowsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
     public async Task<ActionResult<AgentWorkflowDto>> InitiateWorkflow([FromBody] InitiateWorkflowRequestDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Objective))
@@ -55,8 +59,8 @@ public class AgentWorkflowsController : ControllerBase
             return BadRequest(new { message = "Objective is required to initiate an agent workflow." });
         }
 
-        var username = User.Identity?.Name ?? "field_staff_mobile";
-        var role = dto.RequesterRole ?? "Cashier";
+        var username = User.FindFirst(ClaimTypes.Name)?.Value ?? User.Identity?.Name ?? "authorized_user";
+        var role = User.FindFirst(ClaimTypes.Role)?.Value ?? dto.RequesterRole ?? UserRoles.InventoryManager;
 
         var workflow = await _engine.RunWorkflowAsync(dto.Objective.Trim(), username, role);
 
@@ -64,9 +68,14 @@ public class AgentWorkflowsController : ControllerBase
     }
 
     [HttpPost("{id:long}/decision")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<AgentWorkflowDto>> ProcessDecision(long id, [FromBody] WorkflowDecisionRequestDto dto)
     {
-        var username = User.Identity?.Name ?? "admin";
+        var username = User.FindFirst(ClaimTypes.Name)?.Value ?? User.Identity?.Name;
+        if (string.IsNullOrEmpty(username))
+        {
+            return Unauthorized(new { message = "Valid admin identity claim is required to sign off on workflows." });
+        }
 
         try
         {
