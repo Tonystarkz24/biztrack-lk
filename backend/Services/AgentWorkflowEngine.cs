@@ -258,12 +258,14 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
             throw new KeyNotFoundException($"Workflow with ID {workflowId} not found.");
         }
 
+        var trimmedNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+
         var approval = new WorkflowApproval
         {
             WorkflowId = workflow.Id,
             ApproverUsername = approverUsername,
             Decision = decision,
-            DecisionNote = note,
+            DecisionNote = trimmedNote,
             DecidedAt = DateTime.UtcNow
         };
         _context.WorkflowApprovals.Add(approval);
@@ -305,7 +307,7 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
                             Category = "Inventory Restock",
                             Amount = totalCost,
                             ExpenseDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                            Note = $"Restock order approved by {approverUsername}. Note: {note ?? "None"}",
+                            Note = $"Restock order approved by {approverUsername}." + (trimmedNote != null ? $" Note: {trimmedNote}" : ""),
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow
                         });
@@ -318,12 +320,12 @@ public class AgentWorkflowEngine : IAgentWorkflowEngine
             }
 
             workflow.Status = WorkflowStatus.Approved;
-            workflow.FinalOutcome = $"Approved by {approverUsername}. Executed purchase order: updated stock for {itemsUpdated} products and logged restock expense of LKR {totalCost:N2}. Note: {note ?? "None"}";
+            workflow.FinalOutcome = $"Approved by {approverUsername}. Executed purchase order: updated stock for {itemsUpdated} products and logged restock expense of LKR {totalCost:N2}." + (trimmedNote != null ? $" Note: {trimmedNote}" : "");
         }
         else
         {
             workflow.Status = WorkflowStatus.Rejected;
-            workflow.FinalOutcome = $"Rejected by {approverUsername}. Reason: {note ?? "Not specified."}";
+            workflow.FinalOutcome = $"Rejected by {approverUsername}." + (trimmedNote != null ? $" Reason: {trimmedNote}" : " No reason specified.");
         }
 
         workflow.UpdatedAt = DateTime.UtcNow;

@@ -955,6 +955,24 @@ select option:hover {
   margin-bottom: 1.5rem;
 }
 
+.outcome-box.outcome-rejected {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.outcome-box.outcome-rejected strong {
+  color: #f87171;
+}
+
+.outcome-box.outcome-approved {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.outcome-box.outcome-approved strong {
+  color: #34d399;
+}
+
 /* Timeline */
 .timeline {
   display: flex;

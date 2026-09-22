@@ -239,8 +239,8 @@ const AgentWorkflowsPage = () => {
 
               {/* Final Outcome if approved/rejected */}
               {selectedWorkflow.status !== 'RequiresApproval' && selectedWorkflow.finalOutcome && (
-                <div className="outcome-box">
-                  <strong>Workflow Outcome:</strong>
+                <div className={`outcome-box outcome-${selectedWorkflow.status.toLowerCase()}`}>
+                  <strong>Workflow Outcome ({selectedWorkflow.status}):</strong>
                   <p>{selectedWorkflow.finalOutcome}</p>
                 </div>
               )}
