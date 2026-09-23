@@ -96,21 +96,21 @@ const LoginPage = () => {
               className="btn btn-outline btn-sm"
               onClick={() => quickLogin('admin', 'Admin123!')}
             >
-              👑 Admin
+              Admin
             </button>
             <button
               type="button"
               className="btn btn-outline btn-sm"
               onClick={() => quickLogin('manager', 'Manager123!')}
             >
-              📦 Inventory Mgr
+              Inventory Manager
             </button>
             <button
               type="button"
               className="btn btn-outline btn-sm"
               onClick={() => quickLogin('cashier', 'Cashier123!')}
             >
-              🧾 Cashier
+              Cashier
             </button>
           </div>
         </div>

@@ -107,7 +107,7 @@ function SaleForm({ products, loadingProducts, onSaleCreated, showNotification }
       <div className="form-group">
         <label className="form-label">Payment Method</label>
         <div className="payment-toggle">
-          {[["cash","💵"],["card","💳"],["bank_transfer","🏦"]].map(([m, icon]) => (
+          {[["cash","Cash"],["card","Card"],["bank_transfer","Bank Transfer"]].map(([m, label]) => (
             <button
               key={m}
               id={`payment-method-${m}`}
@@ -115,7 +115,7 @@ function SaleForm({ products, loadingProducts, onSaleCreated, showNotification }
               className={`payment-btn${paymentMethod === m ? " payment-btn--active" : ""}`}
               onClick={() => setPaymentMethod(m)}
             >
-              {icon} {m.charAt(0).toUpperCase() + m.slice(1)}
+              {label}
             </button>
           ))}
         </div>

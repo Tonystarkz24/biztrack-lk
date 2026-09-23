@@ -21,7 +21,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
     return (
       <div className="card" style={{ maxWidth: '600px', margin: '3rem auto', textAlign: 'center', padding: '2.5rem' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🛡️</div>
+        <div style={{ marginBottom: '1.25rem' }}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-warning)' }}>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
         <h2>Access Restricted (403)</h2>
         <p className="text-muted" style={{ margin: '1rem 0' }}>
           Your current account role (<strong>{user?.role || 'User'}</strong>) does not have permission to access this page.

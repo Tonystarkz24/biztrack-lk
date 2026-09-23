@@ -206,7 +206,6 @@ function InventoryPage() {
         title="Inventory Auditor Agent"
         studentRole="Student 1 • Inventory Management Component"
         endpoint="/agent/inventory-audit"
-        icon="📦"
         badgeText="Allow-listed DB Tool"
       />
 
@@ -215,9 +214,6 @@ function InventoryPage() {
         <div className="stat-card">
           <div className="stat-header">
             <span>Total Catalog</span>
-            <div className="stat-icon-wrapper" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8' }}>
-              📦
-            </div>
           </div>
           <span className="stat-value">{stats.total}</span>
           <span className="stat-footer">{stats.active} currently active</span>
@@ -226,11 +222,8 @@ function InventoryPage() {
         <div className="stat-card">
           <div className="stat-header">
             <span>Low Stock Alerts</span>
-            <div className="stat-icon-wrapper" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24' }}>
-              ⚠️
-            </div>
           </div>
-          <span className="stat-value" style={{ color: stats.lowStockCount > 0 ? '#fbbf24' : '#f8fafc' }}>
+          <span className="stat-value" style={{ color: stats.lowStockCount > 0 ? 'var(--color-warning)' : 'var(--text-primary)' }}>
             {stats.lowStockCount}
           </span>
           <span className="stat-footer">At or below reorder level</span>
@@ -239,11 +232,8 @@ function InventoryPage() {
         <div className="stat-card">
           <div className="stat-header">
             <span>Out of Stock</span>
-            <div className="stat-icon-wrapper" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}>
-              🚫
-            </div>
           </div>
-          <span className="stat-value" style={{ color: stats.outOfStockCount > 0 ? '#f87171' : '#f8fafc' }}>
+          <span className="stat-value" style={{ color: stats.outOfStockCount > 0 ? 'var(--color-danger)' : 'var(--text-primary)' }}>
             {stats.outOfStockCount}
           </span>
           <span className="stat-footer">Needs immediate replenishment</span>
@@ -252,11 +242,8 @@ function InventoryPage() {
         <div className="stat-card">
           <div className="stat-header">
             <span>Inventory Valuation</span>
-            <div className="stat-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
-              💰
-            </div>
           </div>
-          <span className="stat-value" style={{ fontSize: '1.45rem' }}>
+          <span className="stat-value" style={{ fontSize: '1.45rem', color: 'var(--color-primary)' }}>
             LKR {stats.totalValuation.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
           <span className="stat-footer">Based on cost price</span>

@@ -66,7 +66,7 @@ const ApiStatusBanner = () => {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
         <span style={{ fontWeight: 700 }}>
-          {status === 'misconfigured' ? '⚠️ Configuration Notice:' : '⚠️ Backend Notice:'}
+          {status === 'misconfigured' ? 'Configuration Notice:' : 'Backend Notice:'}
         </span>
         <span>{errorMessage}</span>
       </div>
@@ -75,7 +75,7 @@ const ApiStatusBanner = () => {
         style={{
           background: 'none',
           border: 'none',
-          fontSize: '1rem',
+          fontSize: '1.1rem',
           cursor: 'pointer',
           padding: '0 0.5rem',
           color: 'inherit',
@@ -83,7 +83,7 @@ const ApiStatusBanner = () => {
         }}
         title="Dismiss alert"
       >
-        ✕
+        ×
       </button>
     </div>
   );

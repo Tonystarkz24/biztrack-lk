@@ -63,8 +63,8 @@ function ProductFilters({
         onClick={() => onLowStockChange(!lowStock)}
         title="Show products with stock at or below reorder level"
       >
-        <span>⚠️ Low Stock Only</span>
-        {lowStock && <span>✓</span>}
+        <span>Low Stock Only</span>
+        {lowStock && <span style={{ fontWeight: 700, marginLeft: '4px' }}>(Active)</span>}
       </button>
 
       {/* Reset Button */}

@@ -44,7 +44,7 @@ const Navbar = () => {
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             onClick={closeMenu}
           >
-            🏠 Home
+            Home
           </NavLink>
 
           {user && ['Admin', 'InventoryManager'].includes(user.role) && (
@@ -53,7 +53,7 @@ const Navbar = () => {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              📊 Dashboard
+              Dashboard
             </NavLink>
           )}
 
@@ -63,7 +63,7 @@ const Navbar = () => {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              📦 Inventory
+              Inventory
             </NavLink>
           )}
 
@@ -73,7 +73,7 @@ const Navbar = () => {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              🧾 Sales
+              Sales
             </NavLink>
           )}
 
@@ -83,7 +83,7 @@ const Navbar = () => {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              💸 Expenses
+              Expenses
             </NavLink>
           )}
 
@@ -93,7 +93,7 @@ const Navbar = () => {
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               onClick={closeMenu}
             >
-              🤖 AI Workflows
+              AI Workflows
             </NavLink>
           )}
 
@@ -103,7 +103,7 @@ const Navbar = () => {
                 <span className="user-name">{user.username}</span>
                 <span className="role-tag">{user.role}</span>
                 <button className="btn-logout" onClick={handleLogout} title="Sign Out">
-                  🚪
+                  Sign Out
                 </button>
               </div>
             ) : (

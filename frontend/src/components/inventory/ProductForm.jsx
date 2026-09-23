@@ -350,7 +350,7 @@ function ProductForm({
               {/* Profit Margin Preview */}
               {hasValidPrices && (
                 <div className="margin-preview">
-                  💡 Estimated Markup: <strong>{marginPercent}%</strong> (LKR {(sellVal - costVal).toFixed(2)} profit per {formData.unit || 'unit'})
+                  Estimated Markup: <strong>{marginPercent}%</strong> (LKR {(sellVal - costVal).toFixed(2)} profit per {formData.unit || 'unit'})
                 </div>
               )}
 

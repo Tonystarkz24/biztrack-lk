@@ -100,20 +100,20 @@ const AgentWorkflowsPage = () => {
     }
   };
 
-  const getAgentEmoji = (role) => {
-    if (role.includes('Inventory') || role.includes('Auditor')) return '📦';
-    if (role.includes('Sales') || role.includes('Demand')) return '🧾';
-    if (role.includes('Procurement') || role.includes('Cost') || role.includes('Action')) return '💸';
-    if (role.includes('Governance') || role.includes('Guardian') || role.includes('Validation')) return '🛡️';
-    if (role.includes('Planner') || role.includes('Coordinator')) return '🧠';
-    return '🤖';
+  const getAgentStepNumber = (role) => {
+    if (role.includes('Inventory') || role.includes('Auditor')) return '1';
+    if (role.includes('Sales') || role.includes('Demand')) return '2';
+    if (role.includes('Procurement') || role.includes('Cost') || role.includes('Action')) return '3';
+    if (role.includes('Governance') || role.includes('Guardian') || role.includes('Validation')) return '4';
+    if (role.includes('Planner') || role.includes('Coordinator')) return '1';
+    return '•';
   };
 
   const getAgentStudentInfo = (role) => {
-    if (role.includes('Inventory') || role.includes('Auditor')) return 'Student 1 (Inventory)';
-    if (role.includes('Sales') || role.includes('Demand')) return 'Student 2 (Sales • Gemini)';
-    if (role.includes('Procurement') || role.includes('Cost') || role.includes('Action')) return 'Student 3 (Expenses • Gemini)';
-    if (role.includes('Governance') || role.includes('Guardian') || role.includes('Validation')) return 'Student 4 (Governance Guard)';
+    if (role.includes('Inventory') || role.includes('Auditor')) return 'Student 1: Inventory';
+    if (role.includes('Sales') || role.includes('Demand')) return 'Student 2: Sales & Demand (Gemini)';
+    if (role.includes('Procurement') || role.includes('Cost') || role.includes('Action')) return 'Student 3: Expenses & Procurement (Gemini)';
+    if (role.includes('Governance') || role.includes('Guardian') || role.includes('Validation')) return 'Student 4: Governance Guardian';
     return 'System Agent';
   };
 
@@ -137,7 +137,7 @@ const AgentWorkflowsPage = () => {
       {/* Trigger New Workflow Form */}
       {['Admin', 'InventoryManager'].includes(user?.role) ? (
         <div className="card workflow-init-card">
-          <h3>🚀 Dispatch Autonomous Workflow</h3>
+          <h3>Dispatch Autonomous Workflow</h3>
           <form onSubmit={handleInitiateWorkflow} className="workflow-init-form">
             <input
               type="text"
@@ -154,7 +154,7 @@ const AgentWorkflowsPage = () => {
         </div>
       ) : (
         <div className="card" style={{ padding: '1rem', background: '#f8fafc', marginBottom: '1.5rem', color: '#64748b' }}>
-          🔒 Workflow dispatching is restricted to Admins and Inventory Managers.
+          Workflow dispatching is restricted to Admins and Inventory Managers.
         </div>
       )}
 
@@ -209,7 +209,7 @@ const AgentWorkflowsPage = () => {
               {selectedWorkflow.status === 'RequiresApproval' && (
                 <div className="approval-banner">
                   <div className="approval-info">
-                    <h4>⚠️ Human-in-the-Loop Review Required</h4>
+                    <h4>Human-in-the-Loop Review Required</h4>
                     <p>{selectedWorkflow.finalOutcome}</p>
                   </div>
                   {user?.role === 'Admin' ? (
@@ -227,20 +227,20 @@ const AgentWorkflowsPage = () => {
                           onClick={() => handleDecision('Approved')}
                           disabled={actionLoading}
                         >
-                          ✓ Approve Purchase Order
+                          Approve Purchase Order
                         </button>
                         <button
                           className="btn btn-danger"
                           onClick={() => handleDecision('Rejected')}
                           disabled={actionLoading}
                         >
-                          ✕ Reject
+                          Reject
                         </button>
                       </div>
                     </div>
                   ) : (
                     <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: '#fef3c7', borderRadius: '6px', color: '#92400e', fontSize: '0.9rem' }}>
-                      <strong>🔒 Admin Action Required:</strong> Only users with the <strong>Admin</strong> role are authorized to sign off or reject budget commitments exceeding LKR 15,000.
+                      <strong>Admin Action Required:</strong> Only users with the <strong>Admin</strong> role are authorized to sign off or reject budget commitments exceeding LKR 15,000.
                     </div>
                   )}
                 </div>
@@ -256,12 +256,12 @@ const AgentWorkflowsPage = () => {
 
               {/* 4 Distinct Agents Execution Trace */}
               <div className="execution-trace-section">
-                <h3>🔍 4-Agent Execution Trace</h3>
+                <h3>4-Agent Execution Trace</h3>
                 <div className="timeline">
                   {selectedWorkflow.executionLogs.map((log) => (
                     <div key={log.id} className="timeline-item">
                       <div className="timeline-badge">
-                        {getAgentEmoji(log.agentRole)}
+                        {getAgentStepNumber(log.agentRole)}
                       </div>
                       <div className="timeline-content">
                         <div className="timeline-header">
@@ -296,7 +296,7 @@ const AgentWorkflowsPage = () => {
               {/* Approval History */}
               {selectedWorkflow.approvals?.length > 0 && (
                 <div className="approvals-history-section">
-                  <h3>✍️ Human Approvals & Sign-off History</h3>
+                  <h3>Human Approvals & Sign-off History</h3>
                   <ul className="approvals-list">
                     {selectedWorkflow.approvals.map((app) => (
                       <li key={app.id} className="approval-item">

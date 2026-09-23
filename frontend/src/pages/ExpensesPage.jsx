@@ -106,7 +106,6 @@ const ExpensesPage = () => {
         title="Procurement Cost Agent"
         studentRole="Student 3 • Expenses & Finance Component"
         endpoint="/agent/procurement-estimate"
-        icon="💸"
         badgeText="Gemini 3.6 Flash + Pricing Tool"
       />
 

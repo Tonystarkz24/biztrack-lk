@@ -218,7 +218,7 @@ function SaleDetailsModal({ saleId, onClose, onCancelled, onUpdated, onDeleted, 
                     className="clear-filters-btn"
                     onClick={() => setIsEditing(true)}
                   >
-                    ✏️ Edit Sale
+                    Edit Sale
                   </button>
                 )}
                 <button
@@ -229,7 +229,7 @@ function SaleDetailsModal({ saleId, onClose, onCancelled, onUpdated, onDeleted, 
                   onClick={handleDelete}
                   disabled={deleting}
                 >
-                  {deleting ? "Deleting..." : "🗑️ Delete Sale"}
+                  {deleting ? "Deleting..." : "Delete Sale"}
                 </button>
               </div>
 
@@ -240,7 +240,7 @@ function SaleDetailsModal({ saleId, onClose, onCancelled, onUpdated, onDeleted, 
                   onClick={handleCancel}
                   disabled={cancelling}
                 >
-                  {cancelling ? "Cancelling&hellip;" : "\u2715 Cancel Sale"}
+                  {cancelling ? "Cancelling..." : "Cancel Sale"}
                 </button>
               )}
             </div>

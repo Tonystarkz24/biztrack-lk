@@ -109,7 +109,6 @@ function SalesPage() {
         title="Sales Demand Agent"
         studentRole="Student 2 • Sales & POS Component"
         endpoint="/agent/sales-demand"
-        icon="🧾"
         badgeText="Gemini 3.6 Flash"
       />
 

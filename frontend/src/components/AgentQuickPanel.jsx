@@ -25,14 +25,11 @@ const AgentQuickPanel = ({ title, endpoint, icon, studentRole, badgeText, onActi
   }, [endpoint]);
 
   return (
-    <div className="card" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #38bdf8', background: 'rgba(15, 23, 42, 0.4)' }}>
+    <div className="card agent-quick-card" style={{ marginBottom: '1.5rem', borderLeft: '4px solid var(--color-primary)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.5rem' }}>{icon}</span>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{title}</h3>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{studentRole}</span>
-          </div>
+        <div>
+          <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{title}</h3>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{studentRole}</span>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>{badgeText}</span>
@@ -42,7 +39,7 @@ const AgentQuickPanel = ({ title, endpoint, icon, studentRole, badgeText, onActi
             disabled={loading}
             style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}
           >
-            {loading ? 'Analyzing...' : '↻ Refresh'}
+            {loading ? 'Analyzing...' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -50,7 +47,7 @@ const AgentQuickPanel = ({ title, endpoint, icon, studentRole, badgeText, onActi
       {loading && <p className="text-muted" style={{ fontSize: '0.85rem' }}>Running agent analysis...</p>}
       
       {error && (
-        <p style={{ color: '#f87171', fontSize: '0.85rem', margin: 0 }}>
+        <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', margin: 0 }}>
           {error}
         </p>
       )}
@@ -61,13 +58,13 @@ const AgentQuickPanel = ({ title, endpoint, icon, studentRole, badgeText, onActi
           {data.agent === 'InventoryAuditorAgent' && (
             <div>
               <p style={{ margin: '0 0 0.5rem 0' }}>
-                Status: <strong style={{ color: data.totalDeficitItems > 0 ? '#f59e0b' : '#10b981' }}>{data.status}</strong> 
+                Status: <strong style={{ color: data.totalDeficitItems > 0 ? 'var(--color-warning)' : 'var(--color-success)' }}>{data.status}</strong> 
                 {' • '}{data.totalDeficitItems} item(s) below reorder threshold.
               </p>
               {data.items && data.items.length > 0 && (
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
                   {data.items.map((item) => (
-                    <span key={item.id} style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.8rem' }}>
+                    <span key={item.id} className="badge badge-danger" style={{ fontSize: '0.8rem' }}>
                       {item.name}: Stock {item.stockQuantity} (Deficit: {item.deficit})
                     </span>
                   ))}
@@ -79,11 +76,11 @@ const AgentQuickPanel = ({ title, endpoint, icon, studentRole, badgeText, onActi
           {/* Sales Demand Data */}
           {data.agent === 'SalesDemandAgent' && (
             <div>
-              <p style={{ margin: '0 0 0.5rem 0', fontStyle: 'italic', color: '#e2e8f0', background: 'rgba(56, 189, 248, 0.08)', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
-                🤖 Gemini Demand Insight: "{data.demandAnalysis}"
+              <p style={{ margin: '0 0 0.5rem 0', fontStyle: 'italic', color: 'var(--text-primary)', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', padding: '0.65rem 0.85rem', borderRadius: '6px' }}>
+                Gemini Demand Insight: "{data.demandAnalysis}"
               </p>
               {data.topVelocityProducts && data.topVelocityProducts.length > 0 && (
-                <small style={{ color: '#94a3b8' }}>
+                <small style={{ color: 'var(--text-secondary)' }}>
                   Top velocity products: {data.topVelocityProducts.map(p => `${p.productName} (${p.totalUnitsSold} units)`).join(', ')}
                 </small>
               )}
@@ -95,11 +92,11 @@ const AgentQuickPanel = ({ title, endpoint, icon, studentRole, badgeText, onActi
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <span>
-                  Estimated Replenishment Cost: <strong style={{ color: '#38bdf8' }}>LKR {data.totalEstimatedCapitalCommitmentLkr?.toLocaleString()}</strong>
+                  Estimated Replenishment Cost: <strong style={{ color: 'var(--color-primary)' }}>LKR {data.totalEstimatedCapitalCommitmentLkr?.toLocaleString()}</strong>
                   {' '}(across {data.deficitProductLines} depleted product lines)
                 </span>
                 <span className={`badge ${data.requiresAdminApproval ? 'badge-warning' : 'badge-success'}`}>
-                  {data.requiresAdminApproval ? '⚠️ Exceeds LKR 15,000 (Requires Admin Sign-off)' : '✓ Within Autonomous Limit'}
+                  {data.requiresAdminApproval ? 'Exceeds LKR 15,000 (Requires Admin Sign-off)' : 'Within Autonomous Limit'}
                 </span>
               </div>
             </div>

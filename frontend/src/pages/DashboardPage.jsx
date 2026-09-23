@@ -116,49 +116,42 @@ const DashboardPage = () => {
               value={formatLKR(summary.revenue)}
               subtitle="Completed sales volume"
               variant="revenue"
-              icon="💰"
             />
             <SummaryCard
               title="Cost of Goods Sold"
               value={formatLKR(summary.costOfGoodsSold)}
               subtitle="Direct inventory procurement costs"
               variant="cogs"
-              icon="📦"
             />
             <SummaryCard
               title="Gross Profit"
               value={formatLKR(summary.grossProfit)}
               subtitle="Revenue minus COGS"
               variant="gross-profit"
-              icon="📈"
             />
             <SummaryCard
               title="Operating Expenses"
               value={formatLKR(summary.expenses)}
               subtitle="Utilities, rent & operational costs"
               variant="expense"
-              icon="💳"
             />
             <SummaryCard
               title="Estimated Net Profit"
               value={formatLKR(summary.estimatedProfit)}
               subtitle="Gross profit minus expenses"
               variant={summary.estimatedProfit >= 0 ? 'profit' : 'danger'}
-              icon={summary.estimatedProfit >= 0 ? '🏆' : '⚠️'}
             />
             <SummaryCard
               title="Active Catalog"
               value={summary.activeProducts}
               subtitle="Active products in inventory"
               variant="info"
-              icon="🏷️"
             />
             <SummaryCard
               title="Low Stock Warning"
               value={summary.lowStockProducts}
               subtitle="Items below reorder threshold"
               variant={summary.lowStockProducts > 0 ? 'warning' : 'neutral'}
-              icon="🔔"
             />
           </div>
 
