@@ -19,6 +19,8 @@ obj/
 *.suo
 *.userosscache
 *.sln.docstates
+backend/appsettings.Development.json
+backend/appsettings.Local.json
 
 # Flutter ignore
 .dart_tool/

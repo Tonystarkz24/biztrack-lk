@@ -88,6 +88,30 @@ public class AgentWorkflowsController : ControllerBase
         }
     }
 
+    [HttpGet("~/api/agent/inventory-audit")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.InventoryManager}")]
+    public async Task<IActionResult> GetInventoryAudit()
+    {
+        var result = await _engine.GetInventoryAuditQuickAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("~/api/agent/sales-demand")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Cashier}")]
+    public async Task<IActionResult> GetSalesDemand()
+    {
+        var result = await _engine.GetSalesDemandQuickAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("~/api/agent/procurement-estimate")]
+    [Authorize(Roles = UserRoles.Admin)]
+    public async Task<IActionResult> GetProcurementEstimate()
+    {
+        var result = await _engine.GetProcurementEstimateQuickAsync();
+        return Ok(result);
+    }
+
     private static AgentWorkflowDto ToDto(AgentWorkflow w) => new()
     {
         Id = w.Id,

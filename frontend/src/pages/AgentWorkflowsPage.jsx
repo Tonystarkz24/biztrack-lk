@@ -101,11 +101,20 @@ const AgentWorkflowsPage = () => {
   };
 
   const getAgentEmoji = (role) => {
-    if (role.includes('Planner')) return '🧠';
-    if (role.includes('Demand')) return '🔍';
-    if (role.includes('Action')) return '⚙️';
-    if (role.includes('Validation')) return '🛡️';
+    if (role.includes('Inventory') || role.includes('Auditor')) return '📦';
+    if (role.includes('Sales') || role.includes('Demand')) return '🧾';
+    if (role.includes('Procurement') || role.includes('Cost') || role.includes('Action')) return '💸';
+    if (role.includes('Governance') || role.includes('Guardian') || role.includes('Validation')) return '🛡️';
+    if (role.includes('Planner') || role.includes('Coordinator')) return '🧠';
     return '🤖';
+  };
+
+  const getAgentStudentInfo = (role) => {
+    if (role.includes('Inventory') || role.includes('Auditor')) return 'Student 1 (Inventory)';
+    if (role.includes('Sales') || role.includes('Demand')) return 'Student 2 (Sales • Gemini)';
+    if (role.includes('Procurement') || role.includes('Cost') || role.includes('Action')) return 'Student 3 (Expenses • Gemini)';
+    if (role.includes('Governance') || role.includes('Guardian') || role.includes('Validation')) return 'Student 4 (Governance Guard)';
+    return 'System Agent';
   };
 
   return (
@@ -257,6 +266,9 @@ const AgentWorkflowsPage = () => {
                       <div className="timeline-content">
                         <div className="timeline-header">
                           <span className="agent-role-name">{log.agentRole}</span>
+                          <span className="badge badge-info" style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem' }}>
+                            {getAgentStudentInfo(log.agentRole)}
+                          </span>
                           <span className="tool-tag">Tool: {log.toolName}</span>
                           <span className="timestamp">
                             {new Date(log.createdAt).toLocaleTimeString()}

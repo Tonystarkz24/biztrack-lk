@@ -37,6 +37,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAgentWorkflowEngine, AgentWorkflowEngine>();
 builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 
 // 3. JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "BizTrack_LK_Super_Secret_Secure_Signing_Key_2026_SE3090_SLIIT!";

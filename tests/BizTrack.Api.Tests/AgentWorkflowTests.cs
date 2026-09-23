@@ -38,7 +38,7 @@ public class AgentWorkflowTests
         });
         await context.SaveChangesAsync();
 
-        var engine = new AgentWorkflowEngine(context, NullLogger<AgentWorkflowEngine>.Instance);
+        var engine = new AgentWorkflowEngine(context, new FakeGeminiService(), NullLogger<AgentWorkflowEngine>.Instance);
 
         var workflow = await engine.RunWorkflowAsync(
             "Replenish critical staples inventory",
@@ -57,10 +57,10 @@ public class AgentWorkflowTests
             .ToListAsync();
 
         Assert.Equal(4, logs.Count);
-        Assert.Equal("CoordinatorPlannerAgent", logs[0].AgentRole);
-        Assert.Equal("DemandAnalyzerAgent", logs[1].AgentRole);
-        Assert.Equal("ActionGeneratorAgent", logs[2].AgentRole);
-        Assert.Equal("ValidationSafetyAgent", logs[3].AgentRole);
+        Assert.Equal("InventoryAuditorAgent", logs[0].AgentRole);
+        Assert.Equal("SalesDemandAgent", logs[1].AgentRole);
+        Assert.Equal("ProcurementCostAgent", logs[2].AgentRole);
+        Assert.Equal("GovernanceGuardianAgent", logs[3].AgentRole);
 
         Assert.Contains("Passed", logs[0].ValidationResult);
         Assert.Contains("Passed", logs[1].ValidationResult);
@@ -88,7 +88,7 @@ public class AgentWorkflowTests
         });
         await context.SaveChangesAsync();
 
-        var engine = new AgentWorkflowEngine(context, NullLogger<AgentWorkflowEngine>.Instance);
+        var engine = new AgentWorkflowEngine(context, new FakeGeminiService(), NullLogger<AgentWorkflowEngine>.Instance);
 
         var workflow = await engine.RunWorkflowAsync(
             "Replenish spices inventory",
@@ -125,7 +125,7 @@ public class AgentWorkflowTests
         context.AgentWorkflows.Add(workflow);
         await context.SaveChangesAsync();
 
-        var engine = new AgentWorkflowEngine(context, NullLogger<AgentWorkflowEngine>.Instance);
+        var engine = new AgentWorkflowEngine(context, new FakeGeminiService(), NullLogger<AgentWorkflowEngine>.Instance);
 
         var result = await engine.ProcessApprovalDecisionAsync(
             workflow.Id,

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import SaleForm from "../components/sales/SaleForm";
 import SalesHistory from "../components/sales/SalesHistory";
 import SaleDetailsModal from "../components/sales/SaleDetailsModal";
+import AgentQuickPanel from "../components/AgentQuickPanel";
 import salesService from "../services/salesService";
 import "../styles/sales.css";
 
@@ -102,6 +103,15 @@ function SalesPage() {
           <p className="sales-page__subtitle">Record and manage your sales</p>
         </div>
       </header>
+
+      {/* Student 2: Sales Demand Agent (Powered by Gemini 3.6 Flash) */}
+      <AgentQuickPanel
+        title="Sales Demand Agent"
+        studentRole="Student 2 • Sales & POS Component"
+        endpoint="/agent/sales-demand"
+        icon="🧾"
+        badgeText="Gemini 3.6 Flash"
+      />
 
       <div className="sales-page__layout">
         <div className="sales-page__form-panel">

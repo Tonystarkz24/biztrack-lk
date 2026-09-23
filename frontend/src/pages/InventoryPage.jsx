@@ -3,6 +3,7 @@ import productService from '../services/productService';
 import ProductFilters from '../components/inventory/ProductFilters';
 import ProductList from '../components/inventory/ProductList';
 import ProductForm from '../components/inventory/ProductForm';
+import AgentQuickPanel from '../components/AgentQuickPanel';
 import '../styles/inventory.css';
 
 /**
@@ -199,6 +200,15 @@ function InventoryPage() {
           <span>＋ Add New Product</span>
         </button>
       </header>
+
+      {/* Student 1: Inventory Auditor Agent */}
+      <AgentQuickPanel
+        title="Inventory Auditor Agent"
+        studentRole="Student 1 • Inventory Management Component"
+        endpoint="/agent/inventory-audit"
+        icon="📦"
+        badgeText="Allow-listed DB Tool"
+      />
 
       {/* Stats Summary Cards */}
       <section className="stats-grid" aria-label="Inventory Statistics">

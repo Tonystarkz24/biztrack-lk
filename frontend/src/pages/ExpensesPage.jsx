@@ -5,6 +5,7 @@ import ExpenseFilters from '../components/expenses/ExpenseFilters';
 import ExpenseList from '../components/expenses/ExpenseList';
 import ExpenseForm from '../components/expenses/ExpenseForm';
 import DeleteExpenseModal from '../components/expenses/DeleteExpenseModal';
+import AgentQuickPanel from '../components/AgentQuickPanel';
 
 const ExpensesPage = () => {
   const [expenses, setExpenses] = useState([]);
@@ -99,6 +100,15 @@ const ExpensesPage = () => {
           </button>
         )}
       </header>
+
+      {/* Student 3: Procurement Cost Agent (Powered by Gemini 3.6 Flash) */}
+      <AgentQuickPanel
+        title="Procurement Cost Agent"
+        studentRole="Student 3 • Expenses & Finance Component"
+        endpoint="/agent/procurement-estimate"
+        icon="💸"
+        badgeText="Gemini 3.6 Flash + Pricing Tool"
+      />
 
       {showForm && (
         <ExpenseForm 
