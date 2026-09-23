@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { getDashboardSummary, formatLKR } from '../services/dashboardService';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import LowStockList from '../components/dashboard/LowStockList';
@@ -80,9 +81,36 @@ const DashboardPage = () => {
             className="btn btn-primary"
             onClick={handleRefresh}
             disabled={loading}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}
           >
-            {loading ? 'Refreshing...' : '🔄 Refresh'}
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+            {loading ? 'Refreshing...' : 'Refresh'}
           </button>
+        </div>
+      </div>
+
+      {/* Quick Action & Health Banner */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', padding: '0.85rem 1.25rem', background: '#ffffff', border: '1px solid rgba(226, 232, 240, 0.9)', borderRadius: '14px', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <span className="status-dot-pulse"></span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            PostgreSQL Cloud Database Synchronized • Live LKR Ledger
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Link to="/sales" className="btn btn-outline btn-sm">
+            + New Sale
+          </Link>
+          <Link to="/inventory" className="btn btn-outline btn-sm">
+            + Add Product
+          </Link>
+          <Link to="/agent-workflows" className="btn btn-outline btn-sm" style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}>
+            AI Agent Trace →
+          </Link>
         </div>
       </div>
 
